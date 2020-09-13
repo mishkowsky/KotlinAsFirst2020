@@ -85,7 +85,7 @@ fun lengthInMeters(sagenes: Int, arshins: Int, vershoks: Int) =
  * Вывести значение того же угла в радианах (например, 0.63256).
  */
 fun angleInRadian(deg: Int, min: Int, sec: Int) =
-    (deg * 3600 + min * 60 + sec) * PI / (180*3600)
+    (deg * 3600 + min * 60 + sec) * PI / (180 * 3600)
 
 /**
  * Тривиальная (1 балл)
@@ -94,7 +94,7 @@ fun angleInRadian(deg: Int, min: Int, sec: Int) =
  * Например, расстояние между (3, 0) и (0, 4) равно 5
  */
 fun trackLength(x1: Double, y1: Double, x2: Double, y2: Double) =
-    sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2))
+    sqrt(sqr(x1 - x2) + sqr(y1 - y2))
 
 /**
  * Простая (2 балла)
@@ -112,7 +112,7 @@ fun thirdDigit(number: Int) = number / 100 % 10
  * Определите время поезда в пути в минутах (в данном случае 216).
  */
 fun travelMinutes(hoursDepart: Int, minutesDepart: Int, hoursArrive: Int, minutesArrive: Int) =
-    (hoursArrive - hoursDepart - 1) * 60 + (60 - minutesDepart) + minutesArrive
+    (hoursArrive - hoursDepart) * 60 + minutesArrive - minutesDepart
 /**
  * Простая (2 балла)
  *
