@@ -1,4 +1,4 @@
-@file:Suppress("UNUSED_PARAMETER")
+@file:Suppress("UNUSED_PARAMETER", "UNREACHABLE_CODE", "TYPE_INFERENCE_ONLY_INPUT_TYPES_WARNING")
 
 package lesson2.task1
 
@@ -68,12 +68,20 @@ fun minBiRoot(a: Double, b: Double, c: Double): Double {
  * Мой возраст. Для заданного 0 < n < 200, рассматриваемого как возраст человека,
  * вернуть строку вида: «21 год», «32 года», «12 лет».
  */
-fun ageDescription(age: Int): String = TODO()
+fun ageDescription(age: Int): String {
+    return if ((age % 100) in 11..14) "$age лет" else {
+        when (age % 10) {
+            1 -> "$age год"
+            in 2..4 -> "$age года"
+            else -> "$age лет"
+        }
+    }
+}
 
 /**
  * Простая (2 балла)
  *
- * Путник двигался t1 часов со скоростью v1 км/час, затем t2 часов — со скоростью v2 км/час
+ * Путник двигался t1 часов со скорост-ью v1 км/час, затем t2 часов — со скоростью v2 км/час
  * и t3 часов — со скоростью v3 км/час.
  * Определить, за какое время он одолел первую половину пути?
  */
@@ -81,7 +89,14 @@ fun timeForHalfWay(
     t1: Double, v1: Double,
     t2: Double, v2: Double,
     t3: Double, v3: Double
-): Double = TODO()
+): Double {
+    val s: Double = (t1 * v1 + t2 * v2 + t3 * v3) / 2
+    return when {
+        (s - t1 * v1) <= 0 -> (s / v1)
+        (s - t1 * v1 - t2 * v2) <= 0 -> (t1 + (s - t1 * v1) / v2)
+        else -> t1 + t2 + (s - t1 * v1 - t2 * v2) / v3
+    }
+}
 
 /**
  * Простая (2 балла)
@@ -132,4 +147,16 @@ fun triangleKind(a: Double, b: Double, c: Double): Int = TODO()
  * Найти длину пересечения отрезков AB и CD.
  * Если пересечения нет, вернуть -1.
  */
-fun segmentLength(a: Int, b: Int, c: Int, d: Int): Int = TODO()
+fun segmentLength(a: Int, b: Int, c: Int, d: Int): Int = when {
+    c >= a -> when {
+        b in c..d -> b - c
+        d in a..b -> d - c
+        else -> -1
+    }
+    a > c -> when {
+        d in a..b -> d - a
+        b in a..d -> b - a
+        else -> -1
+    }
+    else -> -1
+}
