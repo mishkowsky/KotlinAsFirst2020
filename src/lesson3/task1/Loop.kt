@@ -2,6 +2,8 @@
 
 package lesson3.task1
 
+import lesson1.task1.sqr
+import kotlin.math.pow
 import kotlin.math.sqrt
 
 // Урок 3: циклы
@@ -80,7 +82,17 @@ fun digitNumber(n: Int): Int = TODO()
  * Найти число Фибоначчи из ряда 1, 1, 2, 3, 5, 8, 13, 21, ... с номером n.
  * Ряд Фибоначчи определён следующим образом: fib(1) = 1, fib(2) = 1, fib(n+2) = fib(n) + fib(n+1)
  */
-fun fib(n: Int): Int = TODO()
+fun fib(n: Int): Int {
+    var f = 1
+    var f1 = 0
+    var f2 = 1
+    for (i in 1 until n) {
+        f = f1 + f2
+        f1 = f2
+        f2 = f
+    }
+    return f
+}
 
 /**
  * Простая (2 балла)
@@ -190,7 +202,13 @@ fun sin(x: Double, eps: Double): Double = TODO()
  * Подумайте, как добиться более быстрой сходимости ряда при больших значениях x.
  * Использовать kotlin.math.cos и другие стандартные реализации функции косинуса в этой задаче запрещается.
  */
-fun cos(x: Double, eps: Double): Double = TODO()
+fun cos(x: Double, eps: Double): Double {
+    var i = 0
+    var result = 1
+    do {
+        result = (- x.pow(i)).toInt()
+    } while ()
+}
 
 /**
  * Сложная (4 балла)
@@ -201,7 +219,21 @@ fun cos(x: Double, eps: Double): Double = TODO()
  *
  * Использовать операции со строками в этой задаче запрещается.
  */
-fun squareSequenceDigit(n: Int): Int = TODO()
+fun squareSequenceDigit(n: Int): Int {
+    var i = 1
+    var k = 0
+    do {
+        var s = sqr(i)
+        do {
+            s /= 10
+            k++
+        } while (s > 0)
+        if (k == n) return sqr(i) % 10
+        if (k > n) return ((sqr(i) / (10.0.pow(k - n))) % 10).toInt()
+        i++
+    } while (k < n)
+    return -1 // Вывод ошибки, т.к. по крайней мере один из двух условных операторов if должен сработать
+}
 
 /**
  * Сложная (5 баллов)
@@ -212,4 +244,19 @@ fun squareSequenceDigit(n: Int): Int = TODO()
  *
  * Использовать операции со строками в этой задаче запрещается.
  */
-fun fibSequenceDigit(n: Int): Int = TODO()
+fun fibSequenceDigit(n: Int): Int {
+    var i = 1
+    var k = 0
+    do {
+        var s = fib(i)
+        do {
+            s /= 10
+            k++
+        } while (s > 0)
+        if (k == n) return fib(i) % 10
+        if (k > n) return ((fib(i) / (10.0.pow(k - n))) % 10).toInt()
+        i++
+    } while (k < n)
+    return -1 // Вывод ошибки, т.к. по крайней мере один из двух условных операторов if должен сработать
+}
+
