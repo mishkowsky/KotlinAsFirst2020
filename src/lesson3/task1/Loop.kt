@@ -223,7 +223,7 @@ fun cos(x: Double, eps: Double): Double {
     var k = 0
     var fact = 1.0
     var result = 1.0
-    var m = x
+    var m = abs(x)
     while (m > 2 * PI) m -= 2 * PI
     do {
         k++
