@@ -6,6 +6,7 @@ import lesson1.task1.sqr
 import kotlin.math.abs
 import kotlin.math.pow
 import kotlin.math.sqrt
+import kotlin.math.PI
 
 // Урок 3: циклы
 // Максимальное количество баллов = 9
@@ -218,20 +219,20 @@ fun sin(x: Double, eps: Double): Double = TODO()
  * Использовать kotlin.math.cos и другие стандартные реализации функции косинуса в этой задаче запрещается.
  */
 fun cos(x: Double, eps: Double): Double {
-    var i = 1
-    var k = 1
-    var fact = 1
+    var i = 0
+    var k = 0
+    var fact = 1.0
     var result = 1.0
+    var m = x
+    while (m > 2 * PI) m -= 2 * PI
     do {
-        i++
         k++
-        if (i % 2 == 1) fact *= i
-        else {
-            k++
-            fact *= i
-            result += (-1.0).pow(k - 1) * (x.pow(2 * i)).toInt() / fact
+        fact *= k
+        if (k % 2 == 0) {
+            i++
+            result += (-1.0).pow(i) * (m.pow(k)) / fact
         }
-    } while (abs((x.pow(k - 1)).toInt() / fact) >= eps)
+    } while ((m.pow(k)) / fact >= eps)
     return result
 }
 
