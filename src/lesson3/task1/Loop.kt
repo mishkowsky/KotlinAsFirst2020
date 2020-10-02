@@ -3,6 +3,7 @@
 package lesson3.task1
 
 import lesson1.task1.sqr
+import kotlin.math.abs
 import kotlin.math.pow
 import kotlin.math.sqrt
 
@@ -216,13 +217,23 @@ fun sin(x: Double, eps: Double): Double = TODO()
  * Подумайте, как добиться более быстрой сходимости ряда при больших значениях x.
  * Использовать kotlin.math.cos и другие стандартные реализации функции косинуса в этой задаче запрещается.
  */
-fun cos(x: Double, eps: Double): Double = TODO() /*{
-    var i = 0
-    var result = 1
+fun cos(x: Double, eps: Double): Double {
+    var i = 1
+    var k = 1
+    var fact = 1
+    var result = 1.0
     do {
-        result = (- x.pow(i)).toInt()
-    } while ()
-}*/
+        i++
+        k++
+        if (i % 2 == 1) fact *= i
+        else {
+            k++
+            fact *= i
+            result += (-1.0).pow(k - 1) * (x.pow(2 * i)).toInt() / fact
+        }
+    } while (abs((x.pow(k - 1)).toInt() / fact) >= eps)
+    return result
+}
 
 /**
  * Сложная (4 балла)
@@ -234,19 +245,17 @@ fun cos(x: Double, eps: Double): Double = TODO() /*{
  * Использовать операции со строками в этой задаче запрещается.
  */
 fun squareSequenceDigit(n: Int): Int {
-    var i = 1
+    var i = 0
     var k = 0
     do {
+        i++
         var s = sqr(i)
         do {
             s /= 10
             k++
         } while (s > 0)
-        if (k == n) return sqr(i) % 10
-        if (k > n) return ((sqr(i) / (10.0.pow(k - n))) % 10).toInt()
-        i++
     } while (k < n)
-    return -1 // Вывод ошибки, т.к. по крайней мере один из двух условных операторов if должен сработать
+    return ((sqr(i) / (10.0.pow(k - n))) % 10).toInt()
 }
 
 /**
@@ -259,18 +268,16 @@ fun squareSequenceDigit(n: Int): Int {
  * Использовать операции со строками в этой задаче запрещается.
  */
 fun fibSequenceDigit(n: Int): Int {
-    var i = 1
+    var i = 0
     var k = 0
     do {
+        i++
         var s = fib(i)
         do {
             s /= 10
             k++
         } while (s > 0)
-        if (k == n) return fib(i) % 10
-        if (k > n) return ((fib(i) / (10.0.pow(k - n))) % 10).toInt()
-        i++
     } while (k < n)
-    return -1 // Вывод ошибки, т.к. по крайней мере один из двух условных операторов if должен сработать
+    return ((fib(i) / (10.0.pow(k - n))) % 10).toInt()
 }
 
