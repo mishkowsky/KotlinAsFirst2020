@@ -115,6 +115,9 @@ fun minDivisor(n: Int): Int {
  *
  * Для заданного числа n > 1 найти максимальный делитель, меньший n
  */
+fun maxDivisor(n: Int) = n / minDivisor(n)
+
+/*
 fun maxDivisor(n: Int): Int {
     for (i in 2..sqrt(n.toDouble()).toInt()) {
         if ((n % i) == 0) {
@@ -123,6 +126,7 @@ fun maxDivisor(n: Int): Int {
     }
     return 1
 }
+*/
 
 /**
  * Простая (2 балла)
@@ -223,8 +227,7 @@ fun cos(x: Double, eps: Double): Double {
     var k = 0
     var fact = 1.0
     var result = 1.0
-    var m = abs(x)
-    while (m > 2 * PI) m -= 2 * PI
+    val m = abs(x) % (2 * PI)
     do {
         k++
         fact *= k
