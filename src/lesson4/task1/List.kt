@@ -3,6 +3,7 @@
 package lesson4.task1
 
 import lesson1.task1.discriminant
+import kotlin.math.pow
 import kotlin.math.sqrt
 
 // Урок 4: списки
@@ -137,7 +138,19 @@ fun mean(list: List<Double>): Double = TODO()
  *
  * Обратите внимание, что данная функция должна изменять содержание списка list, а не его копии.
  */
-fun center(list: MutableList<Double>): MutableList<Double> = TODO()
+fun center(list: MutableList<Double>): MutableList<Double> {
+    return if (list.isNotEmpty()) {
+        var sum: Double = 0.0
+        for (i in 0 until list.size) {
+            sum += list[i]
+        }
+        sum /= list.size
+        for (i in 0 until list.size) {
+            list[i] -= sum
+        }
+        list
+    } else list
+}
 
 /**
  * Средняя (3 балла)
@@ -231,7 +244,17 @@ fun decimal(digits: List<Int>, base: Int): Int = TODO()
  * Использовать функции стандартной библиотеки, напрямую и полностью решающие данную задачу
  * (например, str.toInt(base)), запрещается.
  */
-fun decimalFromString(str: String, base: Int): Int = TODO()
+fun decimalFromString(str: String, base: Int): Int {
+    var s = 0
+    var k = 0
+    val b = base.toDouble()
+    while (k < str.length) {
+        str[k].toInt()
+        s += (str[k].toInt() * b.pow(k)).toInt()
+        k++
+    }
+    return s
+}
 
 /**
  * Сложная (5 баллов)
