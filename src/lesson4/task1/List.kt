@@ -246,12 +246,15 @@ fun decimal(digits: List<Int>, base: Int): Int = TODO()
  */
 fun decimalFromString(str: String, base: Int): Int {
     var s = 0
-    var k = 0
+    var k = str.length - 1
+    var i = 0.0
+    var m = "$str".toInt()
     val b = base.toDouble()
-    while (k < str.length) {
-        str[k].toInt()
-        s += (str[k].toInt() * b.pow(k)).toInt()
-        k++
+    while (k >= 0) {
+        s += (m % 10 * b.pow(i)).toInt()
+        k--
+        i++
+        m /= 10
     }
     return s
 }
@@ -273,4 +276,12 @@ fun roman(n: Int): String = TODO()
  * Например, 375 = "триста семьдесят пять",
  * 23964 = "двадцать три тысячи девятьсот шестьдесят четыре"
  */
-fun russian(n: Int): String = TODO()
+fun hundred(n: Int): String = ""
+
+fun russian(n: Int): String {
+    var str = ""
+    if (n > 999) {
+        str += ""
+    }
+    return str
+}
