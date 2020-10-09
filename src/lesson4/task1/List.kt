@@ -140,7 +140,7 @@ fun mean(list: List<Double>): Double = TODO()
  */
 fun center(list: MutableList<Double>): MutableList<Double> {
     return if (list.isNotEmpty()) {
-        var sum: Double = 0.0
+        var sum = 0.0
         for (i in 0 until list.size) {
             sum += list[i]
         }
@@ -248,13 +248,12 @@ fun decimalFromString(str: String, base: Int): Int {
     var s = 0
     var k = str.length - 1
     var i = 0.0
-    var m = "$str".toInt()
     val b = base.toDouble()
     while (k >= 0) {
-        s += (m % 10 * b.pow(i)).toInt()
-        k--
+        val m = if (str[k].toInt() >= 97) str[k].toInt() - 87 else str[k].toInt() - 48
+        s += (m * b.pow(i)).toInt()
         i++
-        m /= 10
+        k--
     }
     return s
 }
@@ -276,12 +275,80 @@ fun roman(n: Int): String = TODO()
  * Например, 375 = "триста семьдесят пять",
  * 23964 = "двадцать три тысячи девятьсот шестьдесят четыре"
  */
-fun hundred(n: Int): String = ""
+fun hundred(n: Int, k: Boolean): String {
+    var str = ""
+    str += when ((n / 100) % 10) {
+        9 -> "девятьсот"
+        8 -> "восемьсот"
+        7 -> "семьсот"
+        6 -> "шестьсот"
+        5 -> "пятьсот"
+        4 -> "четыреста"
+        3 -> "триста"
+        2 -> "двести"
+        1 -> "сто"
+        else -> ""
+    }
+    str += when ((n / 10) % 10) {
+        9 -> " девяносто"
+        8 -> " восемьдесят"
+        7 -> " семьдесят"
+        6 -> " шестьдесят"
+        5 -> " пятьдесят"
+        4 -> " сорок"
+        3 -> " тридцать"
+        2 -> " двадцать"
+        1 -> when (n % 10) {
+            9 -> " девятнадцать"
+            8 -> " восемнадцать"
+            7 -> " семнадцать"
+            6 -> " шестнадцать"
+            5 -> " пятнадцать"
+            4 -> " четырнадцать"
+            3 -> " тринадцать"
+            2 -> " двенадцать"
+            1 -> " одиннадцать"
+            else -> " десять"
+        }
+        else -> ""
+    }
+    if (((n / 10) % 10 != 1) && k && (n % 10 in 1..2)) {
+        str += when (n % 10) {
+            2 -> " две"
+            1 -> " одна"
+            else -> ""
+        }
+    } else
+        if ((n / 10 % 10) != 1) {
+            str += when (n % 10) {
+                9 -> " девять"
+                8 -> " восемь"
+                7 -> " семь"
+                6 -> " шесть"
+                5 -> " пять"
+                4 -> " четыре"
+                3 -> " три"
+                2 -> " два"
+                1 -> " один"
+                else -> ""
+            }
+        }
+    return str.trim()
+}
 
 fun russian(n: Int): String {
     var str = ""
     if (n > 999) {
-        str += ""
+        str += hundred(n / 1000, true)
+        str += if ((n / 1000) % 100 in 11..19) " тысяч"
+        else when (n / 1000 % 10) {
+            in 5..9 -> " тысяч"
+            in 2..4 -> " тысячи"
+            1 -> " тысяча"
+            else -> " тысяч"
+        }
+        if (n % 1000 != 0) str += " "
     }
-    return str
+    str += hundred(n % 1000, false)
+    return str.trim()
 }
