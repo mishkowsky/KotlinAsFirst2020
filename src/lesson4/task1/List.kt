@@ -139,17 +139,11 @@ fun mean(list: List<Double>): Double = TODO()
  * Обратите внимание, что данная функция должна изменять содержание списка list, а не его копии.
  */
 fun center(list: MutableList<Double>): MutableList<Double> {
-    return if (list.isNotEmpty()) {
-        var sum = 0.0
-        for (i in 0 until list.size) {
-            sum += list[i]
-        }
-        sum /= list.size
-        for (i in 0 until list.size) {
-            list[i] -= sum
-        }
-        list
-    } else list
+    val sr = list.sum() / list.size
+    for (i in 0 until list.size) {
+        list[i] -= sr
+    }
+    return list
 }
 
 /**
@@ -250,7 +244,8 @@ fun decimalFromString(str: String, base: Int): Int {
     var i = 0.0
     val b = base.toDouble()
     while (k >= 0) {
-        val m = if (str[k].toInt() >= 97) str[k].toInt() - 87 else str[k].toInt() - 48
+        val m = if (str[k].toInt() >= 'a'.toInt()) str[k].toInt() - 'a'.toInt() + 10
+        else str[k].toInt() - '0'.toInt()
         s += (m * b.pow(i)).toInt()
         i++
         k--
@@ -275,80 +270,91 @@ fun roman(n: Int): String = TODO()
  * Например, 375 = "триста семьдесят пять",
  * 23964 = "двадцать три тысячи девятьсот шестьдесят четыре"
  */
-fun hundred(n: Int, k: Boolean): String {
-    var str = ""
-    str += when ((n / 100) % 10) {
-        9 -> "девятьсот"
-        8 -> "восемьсот"
-        7 -> "семьсот"
-        6 -> "шестьсот"
-        5 -> "пятьсот"
-        4 -> "четыреста"
-        3 -> "триста"
-        2 -> "двести"
-        1 -> "сто"
-        else -> ""
-    }
-    str += when ((n / 10) % 10) {
-        9 -> " девяносто"
-        8 -> " восемьдесят"
-        7 -> " семьдесят"
-        6 -> " шестьдесят"
-        5 -> " пятьдесят"
-        4 -> " сорок"
-        3 -> " тридцать"
-        2 -> " двадцать"
-        1 -> when (n % 10) {
-            9 -> " девятнадцать"
-            8 -> " восемнадцать"
-            7 -> " семнадцать"
-            6 -> " шестнадцать"
-            5 -> " пятнадцать"
-            4 -> " четырнадцать"
-            3 -> " тринадцать"
-            2 -> " двенадцать"
-            1 -> " одиннадцать"
-            else -> " десять"
-        }
-        else -> ""
-    }
-    if (((n / 10) % 10 != 1) && k && (n % 10 in 1..2)) {
-        str += when (n % 10) {
-            2 -> " две"
-            1 -> " одна"
-            else -> ""
-        }
-    } else
-        if ((n / 10 % 10) != 1) {
-            str += when (n % 10) {
-                9 -> " девять"
-                8 -> " восемь"
-                7 -> " семь"
-                6 -> " шесть"
-                5 -> " пять"
-                4 -> " четыре"
-                3 -> " три"
-                2 -> " два"
-                1 -> " один"
-                else -> ""
+fun hundred(n: Int, thousands: Boolean): List<String> {
+    val list = mutableListOf<String>()
+    if (n / 100 % 10 != 0) {
+        list.add(
+            when (n / 100 % 10) {
+                9 -> "девятьсот"
+                8 -> "восемьсот"
+                7 -> "семьсот"
+                6 -> "шестьсот"
+                5 -> "пятьсот"
+                4 -> "четыреста"
+                3 -> "триста"
+                2 -> "двести"
+                else -> "сто"
             }
-        }
-    return str.trim()
+        )
+    }
+    if (n / 10 % 10 != 0) {
+        list.add(
+            when (n / 10 % 10) {
+                9 -> "девяносто"
+                8 -> "восемьдесят"
+                7 -> "семьдесят"
+                6 -> "шестьдесят"
+                5 -> "пятьдесят"
+                4 -> "сорок"
+                3 -> "тридцать"
+                2 -> "двадцать"
+                else -> when (n % 10) {
+                    9 -> "девятнадцать"
+                    8 -> "восемнадцать"
+                    7 -> "семнадцать"
+                    6 -> "шестнадцать"
+                    5 -> "пятнадцать"
+                    4 -> "четырнадцать"
+                    3 -> "тринадцать"
+                    2 -> "двенадцать"
+                    1 -> "одиннадцать"
+                    else -> "десять"
+                }
+            }
+        )
+    }
+    if (n % 10 != 0) {
+        if ((n / 10 % 10 != 1) && thousands && (n % 10 in 1..2)) {
+            list.add(
+                when (n % 10) {
+                    2 -> "две"
+                    else -> "одна"
+                }
+            )
+        } else
+            if (n / 10 % 10 != 1) {
+                list.add(
+                    when (n % 10) {
+                        9 -> "девять"
+                        8 -> "восемь"
+                        7 -> "семь"
+                        6 -> "шесть"
+                        5 -> "пять"
+                        4 -> "четыре"
+                        3 -> "три"
+                        2 -> "два"
+                        else -> "один"
+                    }
+                )
+            }
+    }
+    return list
 }
 
 fun russian(n: Int): String {
-    var str = ""
+    var list = mutableListOf<String>()
     if (n > 999) {
-        str += hundred(n / 1000, true)
-        str += if ((n / 1000) % 100 in 11..19) " тысяч"
-        else when (n / 1000 % 10) {
-            in 5..9 -> " тысяч"
-            in 2..4 -> " тысячи"
-            1 -> " тысяча"
-            else -> " тысяч"
-        }
-        if (n % 1000 != 0) str += " "
+        list = (list + hundred(n / 1000, true)) as MutableList<String>
+        list.add(
+            if ((n / 1000) % 100 in 11..19) "тысяч"
+            else when (n / 1000 % 10) {
+                in 5..9 -> "тысяч"
+                in 2..4 -> "тысячи"
+                1 -> "тысяча"
+                else -> "тысяч"
+            }
+        )
     }
-    str += hundred(n % 1000, false)
-    return str.trim()
+    list = (list + hundred(n % 1000, false)) as MutableList<String>
+    return list.joinToString(" ")
 }
