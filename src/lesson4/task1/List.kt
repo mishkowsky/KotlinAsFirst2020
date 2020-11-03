@@ -342,9 +342,9 @@ fun hundred(n: Int, thousands: Boolean): List<String> {
 }
 
 fun russian(n: Int): String {
-    var list = mutableListOf<String>()
+    val list = mutableListOf<String>()
     if (n > 999) {
-        list = (list + hundred(n / 1000, true)) as MutableList<String>
+        list += hundred(n / 1000, true)
         list.add(
             if ((n / 1000) % 100 in 11..19) "тысяч"
             else when (n / 1000 % 10) {
@@ -355,6 +355,6 @@ fun russian(n: Int): String {
             }
         )
     }
-    list = (list + hundred(n % 1000, false)) as MutableList<String>
+    list += hundred(n % 1000, false)
     return list.joinToString(" ")
 }
