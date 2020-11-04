@@ -2,6 +2,8 @@
 
 package lesson6.task1
 
+import lesson2.task2.daysInMonth
+
 // Урок 6: разбор строк, исключения
 // Максимальное количество баллов = 13
 // Рекомендуемое количество баллов = 11
@@ -74,7 +76,34 @@ fun main() {
  * Обратите внимание: некорректная с точки зрения календаря дата (например, 30.02.2009) считается неверными
  * входными данными.
  */
-fun dateStrToDigit(str: String): String = TODO()
+val months = listOf(
+    "января",
+    "февраля",
+    "марта",
+    "апреля",
+    "мая",
+    "июня",
+    "июля",
+    "августа",
+    "сентября",
+    "октября",
+    "ноября",
+    "декабря"
+)
+
+fun dateStrToDigit(str: String): String {
+    val digit = str.split(" ").toMutableList()
+    if (digit.size == 3) {
+        for (i in months.indices) if (digit[1] == months[i]) digit[1] = (i + 1).toString()
+    } else return ""
+    val date = digit[0].toIntOrNull()
+    val month = digit[1].toIntOrNull()
+    val year = digit[2].toIntOrNull()
+    if ((month == null) || (year == null) || (date == null)) return "" else {
+        if ((date > daysInMonth(month, year)) || (date < 1)) return ""
+    }
+    return String.format("%02d.%02d.%4d", date, month, year)
+}
 
 /**
  * Средняя (4 балла)
@@ -114,7 +143,26 @@ fun flattenPhoneNumber(phone: String): String = TODO()
  * Прочитать строку и вернуть максимальное присутствующее в ней число (717 в примере).
  * При нарушении формата входной строки или при отсутствии в ней чисел, вернуть -1.
  */
-fun bestLongJump(jumps: String): Int = TODO()
+
+val allowedChars = mapOf(
+    "longJumps" to setOf('-', '%'),
+    "highJumps" to setOf('-', '%', '+')
+)
+
+fun bestLongJump(jumps: String): Int {
+    val tries = jumps.split(" ")
+    var max = -1
+    for (n in tries) {
+        if (n.toIntOrNull() == null) {
+            if (!allowedChars["longJumps"]!!.contains(n[0])) return -1
+        }
+        if (n.toIntOrNull() != null) {
+            if (n.toInt() > max) max = n.toInt()
+        }
+
+    }
+    return max
+}
 
 /**
  * Сложная (6 баллов)
@@ -127,7 +175,25 @@ fun bestLongJump(jumps: String): Int = TODO()
  * При нарушении формата входной строки, а также в случае отсутствия удачных попыток,
  * вернуть -1.
  */
-fun bestHighJump(jumps: String): Int = TODO()
+fun bestHighJump(jumps: String): Int {
+    val tries = jumps.split(" ")
+    var max = -1
+    var successful = false
+    if (tries[0].toIntOrNull() == null) return -1
+    for (i in 1 until tries.size) {
+        if (tries[i].toIntOrNull() == null) {
+            for (letter in tries[i]) {
+                if (!allowedChars["highJumps"]!!.contains(letter)) return -1
+                if (letter == '+') successful = true
+            }
+        }
+        if ((tries[i - 1].toIntOrNull() != null) && (successful)) {
+            if (tries[i - 1].toInt() > max) max = tries[i - 1].toInt()
+        }
+        successful = false
+    }
+    return max
+}
 
 /**
  * Сложная (6 баллов)
@@ -138,7 +204,24 @@ fun bestHighJump(jumps: String): Int = TODO()
  * Вернуть значение выражения (6 для примера).
  * Про нарушении формата входной строки бросить исключение IllegalArgumentException
  */
-fun plusMinus(expression: String): Int = TODO()
+fun plusMinus(expression: String): Int {
+    val signs = expression.split(" ")
+    var i = 1
+    var result = 0
+    for (letter in signs[0]) if ((letter < '0') || (letter > '9')) throw IllegalArgumentException()
+    result += signs[0].toInt()
+    while (i < signs.size) {
+        for (letter in signs[i]) if ((letter != '+') && (letter != '-')) throw IllegalArgumentException()
+        for (letter in signs[i + 1]) if ((letter < '0') || (letter > '9')) throw IllegalArgumentException()
+        when {
+            signs[i] == "+" -> result += signs[i + 1].toIntOrNull()!!
+            signs[i] == "-" -> result -= signs[i + 1].toIntOrNull()!!
+            else -> throw IllegalArgumentException()
+        }
+        i += 2
+    }
+    return result
+}
 
 /**
  * Сложная (6 баллов)
@@ -149,7 +232,16 @@ fun plusMinus(expression: String): Int = TODO()
  * Вернуть индекс начала первого повторяющегося слова, или -1, если повторов нет.
  * Пример: "Он пошёл в в школу" => результат 9 (индекс первого 'в')
  */
-fun firstDuplicateIndex(str: String): Int = TODO()
+fun firstDuplicateIndex(str: String): Int {
+    var k = 0
+    val string = str.toLowerCase()
+    val words = string.split(" ")
+    for (i in 0 until words.size - 1) {
+        if (words[i] == words[i + 1]) return k else k += (words[i]).length
+        k += 1
+    }
+    return -1
+}
 
 /**
  * Сложная (6 баллов)
@@ -162,7 +254,19 @@ fun firstDuplicateIndex(str: String): Int = TODO()
  * или пустую строку при нарушении формата строки.
  * Все цены должны быть больше нуля либо равны нулю.
  */
-fun mostExpensive(description: String): String = TODO()
+fun mostExpensive(description: String): String {
+    val list = description.split(" ", "; ")
+    var max = -1.0
+    var result = -1
+    for (i in 1 until list.size step 2) {
+        if (list[i].toDoubleOrNull() == null) return ""
+        if (list[i].toDouble() > max) {
+            max = list[i].toDouble()
+            result = i
+        }
+    }
+    return if (result > 0) list[result - 1] else ""
+}
 
 /**
  * Сложная (6 баллов)
