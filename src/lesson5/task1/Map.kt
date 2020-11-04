@@ -297,14 +297,20 @@ fun propagateHandshakes(friends: Map<String, Set<String>>): Map<String, Set<Stri
     val flag0 = mutableSetOf<String>()
     val flag1 = mutableSetOf<String>()
     val result = mutableMapOf<String, MutableSet<String>>()
+    val buffer = mutableSetOf<String>()
+    val namesBuffer = mutableSetOf<String>()
     for ((name) in friends) {
         result[name] = friends[name]!!.toMutableSet()
         do {
             flag0 += result[name]!!
+            buffer.clear()
+            namesBuffer.clear()
             for (nestedShakes in result[name]!!) {
-                if (result[nestedShakes] == null) result[nestedShakes] = mutableSetOf()
-                result[name]!! += (friends[nestedShakes] ?: setOf())
+                if (result[nestedShakes] == null) namesBuffer += nestedShakes
+                buffer += (friends[nestedShakes] ?: setOf())
             }
+            for (nestedShakes in namesBuffer) result[nestedShakes] = mutableSetOf()
+            result[name]!! += buffer
             flag1 += result[name]!!
         } while (flag0 != flag1)
         flag0.clear()
@@ -332,48 +338,27 @@ fun propagateHandshakes(friends: Map<String, Set<String>>): Map<String, Set<Stri
  *   findSumOfTwo(listOf(1, 2, 3), 4) -> Pair(0, 2)
  *   findSumOfTwo(listOf(1, 2, 3), 6) -> Pair(-1, -1)
  */
-/*
-fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
-    var result = Pair(-1, -1)
-    if (list.isNotEmpty()) {
-        for (i in 0..list.size - 2) {
-            for (j in i + 1 until list.size) {
-                if (list[i] + list[j] == number) result = Pair(i, j)
-            }
-        }
-    }
-    return result
-}
-*/
 
 fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
     var result = Pair(-1, -1)
-    val map = mutableMapOf<Int, Int>()
+    val map = mutableMapOf<Int, Pair<Int, Int>>()
     for ((index, element) in list.withIndex()) {
-        map[element] = index
+        if (map[element] != null) map[element] = Pair(map[element]!!.first, index) else
+            map[element] = Pair(index, -1)
     }
-    for ((element, index) in map) {
-        if ((map[number - element] != null) && (element != number - element)) {
-            result = if (map[element]!! < map[number - element]!!)
-                Pair(index, map[number - element]!!)
-            else Pair(map[number - element]!!, index)
-        }
+    for ((element, indexes) in map) {
+        if (map[number - element] != null)
+            result = if (element != number - element) {
+                if (map[element]!!.first < map[number - element]!!.first)
+                    Pair(indexes.first, map[number - element]!!.first)
+                else Pair(map[number - element]!!.first, indexes.first)
+            } else {
+                map[element]!!
+            }
     }
+    if (result.second == -1) return Pair(-1, -1)
     return result
 }
-
-/*
-fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
-    var result = Pair(-1, -1)
-    val set = mutableSetOf<Int>()
-    set.addAll(list)
-    for (element in set) {
-        if (set.contains(number - element)) result = Pair(element, number - element)
-        if (result != Pair(-1, -1)) break
-    }
-    return result
-}
-*/
 
 /**
  * Очень сложная (8 баллов)

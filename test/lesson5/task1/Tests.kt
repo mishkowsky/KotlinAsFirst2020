@@ -299,6 +299,19 @@ class Tests {
                 )
             )
         )
+        assertEquals(
+            mapOf(
+                "0" to setOf("1", "2"),
+                "1" to setOf("0", "2"),
+                "2" to setOf()
+            ),
+            propagateHandshakes(
+                mapOf(
+                    "0" to setOf("1", "2"),
+                    "1" to setOf("0")
+                )
+            )
+        )
     }
 
     @Test
@@ -315,6 +328,10 @@ class Tests {
         assertEquals(
             Pair(-1, -1),
             findSumOfTwo(listOf(1, 2, 3), 6)
+        )
+        assertEquals(
+            Pair(0, 1),
+            findSumOfTwo(listOf(0, 0), 0)
         )
     }
 
