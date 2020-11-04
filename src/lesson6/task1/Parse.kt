@@ -102,7 +102,7 @@ fun dateStrToDigit(str: String): String {
     if ((month == null) || (year == null) || (date == null)) return "" else {
         if ((date > daysInMonth(month, year)) || (date < 1)) return ""
     }
-    return String.format("%02d.%02d.%4d", date, month, year)
+    return String.format("%02d.%02d.%d", date, month, year)
 }
 
 /**
@@ -152,6 +152,7 @@ val allowedChars = mapOf(
 fun bestLongJump(jumps: String): Int {
     val tries = jumps.split(" ")
     var max = -1
+    if (jumps == "") return -1
     for (n in tries) {
         if (n.toIntOrNull() == null) {
             if (!allowedChars["longJumps"]!!.contains(n[0])) return -1
@@ -177,6 +178,7 @@ fun bestLongJump(jumps: String): Int {
  */
 fun bestHighJump(jumps: String): Int {
     val tries = jumps.split(" ")
+    if (jumps == "") return -1
     var max = -1
     var successful = false
     if (tries[0].toIntOrNull() == null) return -1
