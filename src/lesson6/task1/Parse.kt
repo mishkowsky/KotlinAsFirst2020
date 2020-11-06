@@ -154,6 +154,7 @@ fun bestLongJump(jumps: String): Int {
     var max = -1
     if (jumps == "") return -1
     for (n in tries) {
+        if (n == "") return -1
         if (n.toIntOrNull() == null) {
             if (!allowedChars["longJumps"]!!.contains(n[0])) return -1
         }

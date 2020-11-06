@@ -2,6 +2,8 @@
 
 package lesson5.task1
 
+import java.lang.Byte.MAX_VALUE
+
 // Урок 5: ассоциативные массивы и множества
 // Максимальное количество баллов = 14
 // Рекомендуемое количество баллов = 9
@@ -97,10 +99,9 @@ fun buildWordSet(text: List<String>): MutableSet<String> {
  *     -> mapOf(5 to listOf("Семён", "Михаил"), 3 to listOf("Марат"))
  */
 fun buildGrades(grades: Map<String, Int>): Map<Int, List<String>> {
-    val result = mutableMapOf<Int, MutableList<String>>()
+    val result = mutableMapOf<Int, List<String>>()
     for ((name, mark) in grades) {
-        if (result[mark] == null) result[mark] = mutableListOf()
-        (result[mark])!!.add(name)
+        result[mark] = (result[mark] ?: listOf()).plus(name)
     }
     return result.toMap()
 }
@@ -116,12 +117,10 @@ fun buildGrades(grades: Map<String, Int>): Map<Int, List<String>> {
  *   containsIn(mapOf("a" to "z"), mapOf("a" to "zee", "b" to "sweet")) -> false
  */
 fun containsIn(a: Map<String, String>, b: Map<String, String>): Boolean {
-    var result = true
     for ((key, _) in a) {
-        if (a[key] != b[key]) result = false
-        if (!result) break
+        if (a[key] != b[key]) return false
     }
-    return result
+    return true
 }
 
 /**
@@ -171,8 +170,7 @@ fun whoAreInBoth(a: List<String>, b: List<String>): List<String> = TODO()
  *   ) -> mapOf("Emergency" to "112, 911", "Police" to "02")
  */
 fun mergePhoneBooks(mapA: Map<String, String>, mapB: Map<String, String>): Map<String, String> {
-    val map = mutableMapOf<String, String>()
-    for ((key, value) in mapA) map[key] = value
+    val map = mapA.toMutableMap()
     for ((key, value) in mapB) {
         if ((map[key] != mapB[key]) && (map[key] != null)) map[key] += ", $value" else map[key] = value
     }
@@ -207,10 +205,10 @@ fun averageStockPrice(stockPrices: List<Pair<String, Double>>): Map<String, Doub
  *   ) -> "Мария"
  */
 fun findCheapestStuff(stuff: Map<String, Pair<String, Double>>, kind: String): String? {
-    var min = 1000000.0
+    var min = Double.MAX_VALUE
     var result: String? = null
     for ((key, value) in stuff) {
-        if ((value.first == kind) && (value.second < min)) {
+        if ((value.first == kind) && (value.second <= min)) {
             result = key
             min = value.second
         }
@@ -340,24 +338,22 @@ fun propagateHandshakes(friends: Map<String, Set<String>>): Map<String, Set<Stri
  */
 
 fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
+    val map = mutableMapOf<Int, Int>()
     var result = Pair(-1, -1)
-    val map = mutableMapOf<Int, Pair<Int, Int>>()
     for ((index, element) in list.withIndex()) {
-        if (map[element] != null) map[element] = Pair(map[element]!!.first, index) else
-            map[element] = Pair(index, -1)
+        map[element] = index
+        if (element == number / 2 && number % 2 == 0) {
+            if (result.first != -1) return Pair(result.first, index)
+            else result = Pair(index, -1)
+        }
     }
-    for ((element, indexes) in map) {
-        if (map[number - element] != null)
-            result = if (element != number - element) {
-                if (map[element]!!.first < map[number - element]!!.first)
-                    Pair(indexes.first, map[number - element]!!.first)
-                else Pair(map[number - element]!!.first, indexes.first)
-            } else {
-                map[element]!!
-            }
+    for ((element, index) in map) {
+        val index2 = map[number - element] ?: -1
+        if ((index2 != -1) && (element != number - element)) {
+            return if (index < index2) Pair(index, index2) else Pair(index2, index)
+        }
     }
-    if (result.second == -1) return Pair(-1, -1)
-    return result
+    return Pair(-1, -1)
 }
 
 /**

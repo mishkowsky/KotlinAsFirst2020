@@ -227,6 +227,13 @@ class Tests {
                 "печенье"
             )
         )
+        assertEquals(
+            "",
+            findCheapestStuff(
+                mapOf("" to ("" to 1.7976931348623157e+308)),
+                ""
+            )
+        )
     }
 
     @Test
@@ -332,6 +339,10 @@ class Tests {
         assertEquals(
             Pair(0, 1),
             findSumOfTwo(listOf(0, 0), 0)
+        )
+        assertEquals(
+            Pair(0, 1),
+            findSumOfTwo(listOf(2, 2, 9, 10), 4)
         )
     }
 
