@@ -264,8 +264,8 @@ fun chooseLongestChaoticWord(inputName: String, outputName: String) {
             }
         }
     }
-    for (line in longWords) {
-        if (line != longWords[0]) writer.write(", ")
+    for ((i, line) in longWords.withIndex()) {
+        if (i != 0) writer.write(", ")
         writer.write(line)
     }
     writer.close()
