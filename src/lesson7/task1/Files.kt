@@ -68,7 +68,7 @@ fun deleteMarked(inputName: String, outputName: String) {
         if (line == "") {
             writer.write(line)
             writer.newLine()
-        } else if (line[0] != '_') {
+        } else if (!line.startsWith('_')) {
             writer.write(line)
             writer.newLine()
         }
@@ -85,8 +85,21 @@ fun deleteMarked(inputName: String, outputName: String) {
  * Регистр букв игнорировать, то есть буквы е и Е считать одинаковыми.
  *
  */
-fun countSubstrings(inputName: String, substrings: List<String>): Map<String, Int> = TODO()
-
+fun countSubstrings(inputName: String, substrings: List<String>): Map<String, Int> {
+    val map = mutableMapOf<String, Int>()
+    val file = File(inputName).readText().toLowerCase()
+    for (string in substrings) {
+        var i = 0
+        map[string] = 0
+        val lowString = string.toLowerCase()
+        while (i <= file.length - string.length) {
+            val segment = file.substring(i, i + string.length)
+            if (segment == lowString) map[string] = (map[string] ?: 0) + 1
+            i += 1
+        }
+    }
+    return map
+}
 
 /**
  * Средняя (12 баллов)
@@ -244,15 +257,16 @@ fun transliterate(inputName: String, dictionary: Map<Char, String>, outputName: 
  */
 fun chooseLongestChaoticWord(inputName: String, outputName: String) {
     var max = -1
-    val writer = File(outputName).bufferedWriter()
+    val chars = mutableMapOf<Char, Int>()
     val longWords = mutableListOf<String>()
     for (words in File(inputName).readLines()) {
         val word = words.toLowerCase()
         if (word.length >= max) {
             var uniqe = true
+            chars.clear()
             for (char in word) {
-                val matchResult = Regex("$char").findAll(word)
-                if (matchResult.count() != 1) uniqe = false
+                chars[char] = (chars[char] ?: 0) + 1
+                if (chars[char]!! > 1) uniqe = false
                 if (!uniqe) break
             }
             if (word.length == max && uniqe) {
@@ -264,10 +278,8 @@ fun chooseLongestChaoticWord(inputName: String, outputName: String) {
             }
         }
     }
-    for ((i, line) in longWords.withIndex()) {
-        if (i != 0) writer.write(", ")
-        writer.write(line)
-    }
+    val writer = File(outputName).bufferedWriter()
+    writer.write(longWords.joinToString(", "))
     writer.close()
 }
 

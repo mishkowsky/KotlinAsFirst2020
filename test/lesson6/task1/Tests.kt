@@ -79,6 +79,12 @@ class Tests {
         assertEquals(-1, bestLongJump("-190 - % %"))
         assertEquals(-1, bestLongJump(""))
         assertEquals(-1, bestLongJump("-    -"))
+        assertEquals(-1, bestLongJump("+123 13"))
+        assertEquals(-1, bestLongJump("-123 13"))
+        assertEquals(-1, bestLongJump("- -"))
+        assertEquals(123, bestLongJump("123 123 -"))
+        assertEquals(-1, bestLongJump("1%23- 123 -"))
+        assertEquals(-1, bestLongJump("023 123 -"))
     }
 
     @Test
@@ -89,6 +95,11 @@ class Tests {
         assertEquals(-1, bestHighJump(""))
         assertEquals(230, bestHighJump("220 + 224 %+ 228 %- 230 + 232 %%- 234 %"))
         assertEquals(-1, bestHighJump("-    -"))
+        assertEquals(-1, bestHighJump("-123 +"))
+        assertEquals(-1, bestHighJump("123 +-="))
+        assertEquals(-1, bestHighJump("123 124 +"))
+        assertEquals(-1, bestHighJump("124 + +"))
+        assertEquals(-1, bestHighJump("0124 +"))
     }
 
     @Test
@@ -102,8 +113,10 @@ class Tests {
         assertThrows(IllegalArgumentException::class.java) { plusMinus("+2") }
         assertThrows(IllegalArgumentException::class.java) { plusMinus("+ 4") }
         assertThrows(IllegalArgumentException::class.java) { plusMinus("4 - -2") }
-        assertThrows(IllegalArgumentException::class.java) { plusMinus("44 - - 12") }
+        assertThrows(IllegalArgumentException::class.java) { plusMinus("-44 -") }
         assertThrows(IllegalArgumentException::class.java) { plusMinus("4 - + 12") }
+        assertThrows(IllegalArgumentException::class.java) { plusMinus("4 - +") }
+        assertThrows(IllegalArgumentException::class.java) { plusMinus("04 - 09") }
     }
 
     @Test
@@ -123,6 +136,7 @@ class Tests {
         assertEquals("Курица", mostExpensive("Хлеб 39.9; Молоко 62.5; Курица 184.0; Конфеты 89.9"))
         assertEquals("Вино", mostExpensive("Вино 255.0"))
         assertEquals("", mostExpensive("Хлеб Еще Хлеб 39.9; Молоко 62.5; Курица 184.0; Конфеты 89.9"))
+        assertEquals("", mostExpensive("Хлеб -9.9; Молоко 62.5; Курица 184.0; Конфеты 89.9"))
     }
 
     @Test

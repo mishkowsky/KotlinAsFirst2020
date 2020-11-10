@@ -93,15 +93,13 @@ val months = listOf(
 
 fun dateStrToDigit(str: String): String {
     val digit = str.split(" ").toMutableList()
-    if (digit.size == 3) {
-        for (i in months.indices) if (digit[1] == months[i]) digit[1] = (i + 1).toString()
-    } else return ""
+    if (digit.size != 3) return ""
+    digit[1] = (months.indexOf(digit[1]) + 1).toString()
     val date = digit[0].toIntOrNull()
     val month = digit[1].toIntOrNull()
     val year = digit[2].toIntOrNull()
-    if ((month == null) || (year == null) || (date == null)) return "" else {
-        if ((date > daysInMonth(month, year)) || (date < 1)) return ""
-    }
+    if (month == null || year == null || date == null) return ""
+    if (date > daysInMonth(month, year) || date < 1) return ""
     return String.format("%02d.%02d.%d", date, month, year)
 }
 
@@ -144,24 +142,22 @@ fun flattenPhoneNumber(phone: String): String = TODO()
  * При нарушении формата входной строки или при отсутствии в ней чисел, вернуть -1.
  */
 
-val allowedChars = mapOf(
-    "longJumps" to setOf('-', '%'),
-    "highJumps" to setOf('-', '%', '+')
-)
+val longJumps = setOf('-', '%')
+val highJumps = setOf('-', '%', '+')
+
 
 fun bestLongJump(jumps: String): Int {
     val tries = jumps.split(" ")
     var max = -1
-    if (jumps == "") return -1
+    if (jumps.isEmpty) return -1
     for (n in tries) {
-        if (n == "") return -1
-        if (n.toIntOrNull() == null) {
-            if (!allowedChars["longJumps"]!!.contains(n[0])) return -1
+        for (letter in n)
+            if (letter !in '0'..'9' && (letter !in longJumps || n.length > 1) || n[0] == '0')
+                return -1
+        val jump = n.toIntOrNull()
+        if (jump != null) {
+            if (jump > max) max = jump
         }
-        if (n.toIntOrNull() != null) {
-            if (n.toInt() > max) max = n.toInt()
-        }
-
     }
     return max
 }
@@ -179,21 +175,19 @@ fun bestLongJump(jumps: String): Int {
  */
 fun bestHighJump(jumps: String): Int {
     val tries = jumps.split(" ")
-    if (jumps == "") return -1
+    var i = 0
     var max = -1
-    var successful = false
-    if (tries[0].toIntOrNull() == null) return -1
-    for (i in 1 until tries.size) {
-        if (tries[i].toIntOrNull() == null) {
-            for (letter in tries[i]) {
-                if (!allowedChars["highJumps"]!!.contains(letter)) return -1
-                if (letter == '+') successful = true
-            }
+    if (jumps.isEmpty || tries.size % 2 == 1) return -1
+    while (i < tries.size) {
+        var successful = false
+        val jump = tries[i]
+        for (letter in jump) if (letter !in '0'..'9' || jump[0] == '0') return -1
+        for (letter in tries[i + 1]) {
+            if (letter !in highJumps) return -1
+            if (letter == '+') successful = true
         }
-        if ((tries[i - 1].toIntOrNull() != null) && (successful)) {
-            if (tries[i - 1].toInt() > max) max = tries[i - 1].toInt()
-        }
-        successful = false
+        if (jump.toInt() >= max && successful) max = jump.toInt()
+        i += 2
     }
     return max
 }
@@ -211,15 +205,18 @@ fun plusMinus(expression: String): Int {
     val signs = expression.split(" ")
     var i = 1
     var result = 0
-    for (letter in signs[0]) if ((letter < '0') || (letter > '9')) throw IllegalArgumentException()
+    for (letter in signs[0]) if (letter !in '0'..'9' || (signs[0][0] == '0' && signs[0].length > 1))
+        throw IllegalArgumentException("BadFormat")
     result += signs[0].toInt()
+    if (signs.size % 2 != 1) throw IllegalArgumentException("BadFormat")
     while (i < signs.size) {
-        for (letter in signs[i]) if ((letter != '+') && (letter != '-')) throw IllegalArgumentException()
-        for (letter in signs[i + 1]) if ((letter < '0') || (letter > '9')) throw IllegalArgumentException()
+        val number = signs[i + 1]
+        for (letter in number) if (letter !in '0'..'9' || (number[0] == '0' && number.length > 1))
+            throw IllegalArgumentException("BadFormat")
         when {
-            signs[i] == "+" -> result += signs[i + 1].toIntOrNull()!!
-            signs[i] == "-" -> result -= signs[i + 1].toIntOrNull()!!
-            else -> throw IllegalArgumentException()
+            signs[i] == "+" -> result += number.toInt()
+            signs[i] == "-" -> result -= number.toInt()
+            else -> throw IllegalArgumentException("BadFormat")
         }
         i += 2
     }
@@ -259,12 +256,13 @@ fun firstDuplicateIndex(str: String): Int {
  */
 fun mostExpensive(description: String): String {
     val list = description.split(" ", "; ")
-    var max = -1.0
+    var max = 0.0
     var result = -1
     for (i in 1 until list.size step 2) {
-        if (list[i].toDoubleOrNull() == null) return ""
-        if (list[i].toDouble() > max) {
-            max = list[i].toDouble()
+        val price = list[i].toDoubleOrNull() ?: return ""
+        if (price < 0) return ""
+        if (price >= max) {
+            max = price
             result = i
         }
     }
