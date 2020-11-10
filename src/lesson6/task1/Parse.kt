@@ -149,7 +149,7 @@ val highJumps = setOf('-', '%', '+')
 fun bestLongJump(jumps: String): Int {
     val tries = jumps.split(" ")
     var max = -1
-    if (jumps.isEmpty) return -1
+    if (jumps.isEmpty()) return -1
     for (n in tries) {
         for (letter in n)
             if (letter !in '0'..'9' && (letter !in longJumps || n.length > 1) || n[0] == '0')
@@ -177,7 +177,7 @@ fun bestHighJump(jumps: String): Int {
     val tries = jumps.split(" ")
     var i = 0
     var max = -1
-    if (jumps.isEmpty || tries.size % 2 == 1) return -1
+    if (jumps.isEmpty() || tries.size % 2 == 1) return -1
     while (i < tries.size) {
         var successful = false
         val jump = tries[i]
