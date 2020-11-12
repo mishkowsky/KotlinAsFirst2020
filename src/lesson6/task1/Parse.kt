@@ -151,9 +151,7 @@ fun bestLongJump(jumps: String): Int {
     var max = -1
     if (jumps.isEmpty()) return -1
     for (n in tries) {
-        for (letter in n)
-            if (letter !in '0'..'9' && (letter !in longJumps || n.length > 1) || n[0] == '0')
-                return -1
+        if (n.any { !it.isDigit() && (it !in longJumps || n.length > 1) || n[0] == '0' }) return -1
         val jump = n.toIntOrNull()
         if (jump != null) {
             if (jump > max) max = jump
@@ -181,7 +179,7 @@ fun bestHighJump(jumps: String): Int {
     while (i < tries.size) {
         var successful = false
         val jump = tries[i]
-        for (letter in jump) if (letter !in '0'..'9' || jump[0] == '0') return -1
+        if (jump.any { !it.isDigit() } || jump[0] == '0') return -1
         for (letter in tries[i + 1]) {
             if (letter !in highJumps) return -1
             if (letter == '+') successful = true
@@ -201,18 +199,20 @@ fun bestHighJump(jumps: String): Int {
  * Вернуть значение выражения (6 для примера).
  * Про нарушении формата входной строки бросить исключение IllegalArgumentException
  */
+fun legalElement(element: String): Boolean =
+    element.any { !it.isDigit() } || (element[0] == '0' && element.length > 1)
+
 fun plusMinus(expression: String): Int {
     val signs = expression.split(" ")
     var i = 1
     var result = 0
-    for (letter in signs[0]) if (letter !in '0'..'9' || (signs[0][0] == '0' && signs[0].length > 1))
-        throw IllegalArgumentException("BadFormat")
+    if (expression.isEmpty()) throw IllegalArgumentException("BadFormat")
+    if (legalElement(signs[0])) throw IllegalArgumentException("BadFormat")
     result += signs[0].toInt()
     if (signs.size % 2 != 1) throw IllegalArgumentException("BadFormat")
     while (i < signs.size) {
         val number = signs[i + 1]
-        for (letter in number) if (letter !in '0'..'9' || (number[0] == '0' && number.length > 1))
-            throw IllegalArgumentException("BadFormat")
+        if (legalElement(number)) throw IllegalArgumentException("BadFormat")
         when {
             signs[i] == "+" -> result += number.toInt()
             signs[i] == "-" -> result -= number.toInt()
