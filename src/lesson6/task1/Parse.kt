@@ -263,7 +263,7 @@ fun mostExpensive(description: String): String {
     var result = -1
     if (list.size % 2 ==1) return ""
     for (i in 1 until list.size step 2) {
-        if (list[i].isEmpty) return ""
+        if (list[i].isEmpty()) return ""
         val price = list[i].toDoubleOrNull() ?: return ""
         if (price < 0) return ""
         if (price >= max) {
