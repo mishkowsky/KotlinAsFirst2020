@@ -179,6 +179,7 @@ fun bestHighJump(jumps: String): Int {
     while (i < tries.size) {
         var successful = false
         val jump = tries[i]
+        if (jump.isEmpty()) return -1
         if (jump.any { !it.isDigit() } || jump[0] == '0') return -1
         for (letter in tries[i + 1]) {
             if (letter !in highJumps) return -1
@@ -238,6 +239,7 @@ fun firstDuplicateIndex(str: String): Int {
     val string = str.toLowerCase()
     val words = string.split(" ")
     for (i in 0 until words.size - 1) {
+        if (words[i].isEmpty()) return -1
         if (words[i] == words[i + 1]) return k else k += (words[i]).length
         k += 1
     }
@@ -259,7 +261,9 @@ fun mostExpensive(description: String): String {
     val list = description.split(" ", "; ")
     var max = 0.0
     var result = -1
+    if (list.size % 2 ==1) return ""
     for (i in 1 until list.size step 2) {
+        if (list[i].isEmpty) return ""
         val price = list[i].toDoubleOrNull() ?: return ""
         if (price < 0) return ""
         if (price >= max) {

@@ -40,6 +40,7 @@ class Tests {
         assertEquals("", dateStrToDigit("23"))
         assertEquals("03.04.2011", dateStrToDigit("3 апреля 2011"))
         assertEquals("", dateStrToDigit("32 сентября 2011"))
+        assertEquals("", dateStrToDigit(" "))
         assertEquals("", dateStrToDigit("29 февраля 1993"))
         assertEquals("02.02.19", dateStrToDigit("2 февраля 19"))
     }
@@ -79,6 +80,7 @@ class Tests {
         assertEquals(-1, bestLongJump("-190 - % %"))
         assertEquals(-1, bestLongJump(""))
         assertEquals(-1, bestLongJump("-    -"))
+        assertEquals(-1, bestHighJump(" "))
         assertEquals(-1, bestLongJump("+123 13"))
         assertEquals(-1, bestLongJump("-123 13"))
         assertEquals(-1, bestLongJump("- -"))
@@ -95,6 +97,7 @@ class Tests {
         assertEquals(-1, bestHighJump(""))
         assertEquals(230, bestHighJump("220 + 224 %+ 228 %- 230 + 232 %%- 234 %"))
         assertEquals(-1, bestHighJump("-    -"))
+        assertEquals(-1, bestHighJump(" "))
         assertEquals(-1, bestHighJump("-123 +"))
         assertEquals(-1, bestHighJump("123 +-="))
         assertEquals(-1, bestHighJump("123 124 +"))
@@ -125,6 +128,9 @@ class Tests {
     fun firstDuplicateIndex() {
         assertEquals(-1, firstDuplicateIndex("Привет"))
         assertEquals(-1, firstDuplicateIndex(""))
+        assertEquals(-1, firstDuplicateIndex(" "))
+        assertEquals(-1, firstDuplicateIndex("привет   привет"))
+        assertEquals(-1, firstDuplicateIndex(" он пошел пошел"))
         assertEquals(9, firstDuplicateIndex("Он пошёл в в школу"))
         assertEquals(40, firstDuplicateIndex("Яблоко упало на ветку с ветки оно упало на на землю"))
         assertEquals(9, firstDuplicateIndex("Мы пошли прямо Прямо располагался магазин"))
@@ -134,8 +140,10 @@ class Tests {
     @Tag("6")
     fun mostExpensive() {
         assertEquals("", mostExpensive(""))
+        assertEquals("", mostExpensive(" "))
         assertEquals("Курица", mostExpensive("Хлеб 39.9; Молоко 62.5; Курица 184.0; Конфеты 89.9"))
-        assertEquals("Вино", mostExpensive("Вино 255.0"))
+        assertEquals("", mostExpensive("Вино 255.0 Конфеты"))
+        assertEquals("", mostExpensive("Вино 255.0  290.0"))
         assertEquals("", mostExpensive("Хлеб Еще Хлеб 39.9; Молоко 62.5; Курица 184.0; Конфеты 89.9"))
         assertEquals("", mostExpensive("Хлеб -9.9; Молоко 62.5; Курица 184.0; Конфеты 89.9"))
     }
