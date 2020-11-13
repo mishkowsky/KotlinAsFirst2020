@@ -3,8 +3,6 @@
 package lesson7.task1
 
 import java.io.File
-import java.lang.StringBuilder
-import kotlin.math.pow
 
 // Урок 7: работа с файлами
 // Урок интегральный, поэтому его задачи имеют сильно увеличенную стоимость
@@ -491,7 +489,6 @@ fun printMultiplicationProcess(lhv: Int, rhv: Int, outputName: String) {
  * Используемые пробелы, отступы и дефисы должны в точности соответствовать примеру.
  *
  */
-
 fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
     TODO()
 }
