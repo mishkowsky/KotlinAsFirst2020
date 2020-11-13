@@ -200,7 +200,8 @@ fun bestHighJump(jumps: String): Int {
  * Про нарушении формата входной строки бросить исключение IllegalArgumentException
  */
 fun legalElement(element: String): Boolean =
-    element.any { !it.isDigit() } || (element[0] == '0' && element.length > 1)
+    if (element.isEmpty()) false else
+        element.any { !it.isDigit() } || (element[0] == '0' && element.length > 1)
 
 fun plusMinus(expression: String): Int {
     val signs = expression.split(" ")
