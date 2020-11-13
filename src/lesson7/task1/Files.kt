@@ -3,6 +3,8 @@
 package lesson7.task1
 
 import java.io.File
+import java.lang.StringBuilder
+import kotlin.math.pow
 
 // Урок 7: работа с файлами
 // Урок интегральный, поэтому его задачи имеют сильно увеличенную стоимость
@@ -89,12 +91,11 @@ fun countSubstrings(inputName: String, substrings: List<String>): Map<String, In
         map[string] = 0
         val lowString = string.toLowerCase()
         var i = 0
-        var index0 = -2
         while (i in file.indices) {
             val index = file.indexOf(lowString, i)
             if (index == -1) break
-            if (index0 != index) map[string] = (map[string] ?: 0) + 1 else i = index
-            index0 = index
+            map[string] = (map[string] ?: 0) + 1
+            i = index
             i++
         }
     }
@@ -262,13 +263,8 @@ fun chooseLongestChaoticWord(inputName: String, outputName: String) {
     for (words in File(inputName).readLines()) {
         val word = words.toLowerCase()
         if (word.length >= max) {
-            var unique = true
-            chars.clear()
-            for (char in word) {
-                if (char in chars) unique = false
-                if (!unique) break
-                chars.add(char)
-            }
+            var unique = false
+            if (word.toSet().size == word.length) unique = true
             if (word.length == max && unique) {
                 longWords.add(words)
             } else if (unique) {
@@ -495,7 +491,45 @@ fun printMultiplicationProcess(lhv: Int, rhv: Int, outputName: String) {
  * Используемые пробелы, отступы и дефисы должны в точности соответствовать примеру.
  *
  */
+fun firstDigits(number: Int, n: Int): Int {
+    val str = "$number"
+    var result = 0
+    var pow = (10.0.pow(n.toDouble() - 1.0)).toInt()
+    for (i in 0 until n) {
+        result += str[i].toString().toInt() * pow
+        pow /= 10
+    }
+    return result
+}
+
 fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
-    TODO()
+    val writer = File(outputName).bufferedWriter()
+    writer.write(" $lhv | $rhv")
+    var result = lhv / rhv
+    var forwardSpace = StringBuilder()
+    var i = 0
+    var remainder = 0
+    var long = 0
+    while (i < "$result".length) {
+        writer.newLine()
+        val current = (("$result"[i]) - '0') * rhv
+        long += "$current".length
+        writer.write("$forwardSpace-$current")
+        writer.newLine()
+        writer.write("$forwardSpace")
+        writer.write("-$current".replace(Regex(".")) { "-" })
+        if (i == 0) remainder = firstDigits(lhv, long) - current
+        else remainder -= current
+
+        writer.newLine()
+        val lineLength = "$forwardSpace-$current".length
+        while (lineLength != ("$forwardSpace" + "$remainder").length) forwardSpace.append(" ")
+        //for (i in 0 until "$forwardSpace-$current".length - "$remainder".length)
+        //forwardSpace.append(.replace(Regex(".")) { " " })
+        remainder = remainder * 10 + ("$lhv"[long - 1] - '0')
+        writer.write("$forwardSpace" + "$remainder")
+        i++
+    }
+    writer.close()
 }
 
