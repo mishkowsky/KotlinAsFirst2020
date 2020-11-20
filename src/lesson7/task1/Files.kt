@@ -574,44 +574,59 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
     var lastRemainder = -1
     val writer = File(outputName).bufferedWriter()
 
-    writer.write(" $lhv | $rhv")
-
-    while (i < "$result".length) {
+    if (result == 0 && lhv / 10 > 0) {
+        writer.write("$lhv | $rhv")
         writer.newLine()
-
-        val current = ("$result"[i] - '0') * rhv
-
-        if (i == 0) long = "$current".length else long++
-
-        if ("$forwardSpace-$current".length != ("$forwardSpace$remainder").length && i != 0 && lastRemainder != 0)
-            forwardSpace.deleteCharAt("$forwardSpace".length - 1)
-        writer.write("$forwardSpace-$current")
-
-        if (i == 0) {
-            val buffer = StringBuilder()
-            while ("$forwardSpace-$current$buffer".length < " $lhv | ".length) buffer.append(" ")
-            writer.write("$buffer$result")
+        i = 0
+        while (i < "$lhv".length - 2) {
+            writer.write(" ")
+            i++
         }
-
+        writer.write("-0   0")
         writer.newLine()
-        writer.write("$forwardSpace")
-        writer.write("-$current".replace(Regex(".")) { "-" })
+        writer.write("$lhv".replace(Regex(".")) { "-" })
         writer.newLine()
+        writer.write("$lhv")
+    } else {
+        writer.write(" $lhv | $rhv")
 
-        if (i == 0) remainder = firstDigits(lhv, long) - current
-        else remainder -= current
+        while (i < "$result".length) {
+            writer.newLine()
 
-        val lineLength = "$forwardSpace-$current".length
-        while (lineLength != ("$forwardSpace$remainder").length) forwardSpace.append(" ")
-        writer.write("$forwardSpace$remainder")
-        lastRemainder = remainder
+            val current = ("$result"[i] - '0') * rhv
 
-        if (i != "$result".length - 1) {
-            remainder = remainder * 10 + ("$lhv"[long] - '0')
-            writer.write(("$lhv"[long] - '0').toString())
+            if (i == 0) long = "$current".length else long++
+
+            if ("$forwardSpace-$current".length != ("$forwardSpace$remainder").length && i != 0 && lastRemainder != 0)
+                forwardSpace.deleteCharAt("$forwardSpace".length - 1)
+            writer.write("$forwardSpace-$current")
+
+            if (i == 0) {
+                val buffer = StringBuilder()
+                while ("$forwardSpace-$current$buffer".length < " $lhv | ".length) buffer.append(" ")
+                writer.write("$buffer$result")
+            }
+
+            writer.newLine()
+            writer.write("$forwardSpace")
+            writer.write("-$current".replace(Regex(".")) { "-" })
+            writer.newLine()
+
+            if (i == 0) remainder = firstDigits(lhv, long) - current
+            else remainder -= current
+
+            val lineLength = "$forwardSpace-$current".length
+            while (lineLength != ("$forwardSpace$remainder").length) forwardSpace.append(" ")
+            writer.write("$forwardSpace$remainder")
+            lastRemainder = remainder
+
+            if (i != "$result".length - 1) {
+                remainder = remainder * 10 + ("$lhv"[long] - '0')
+                writer.write(("$lhv"[long] - '0').toString())
+            }
+
+            i++
         }
-
-        i++
     }
     writer.close()
 }
