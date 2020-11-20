@@ -3,6 +3,8 @@
 package lesson7.task1
 
 import java.io.File
+import java.util.*
+
 
 // Урок 7: работа с файлами
 // Урок интегральный, поэтому его задачи имеют сильно увеличенную стоимость
@@ -309,7 +311,7 @@ Suspendisse ~~et elit in enim tempus iaculis~~.
 <html>
 <body>
 <p>
-Lorem ipsum <i>dolor sit amet</i>, consectetur <b>adipiscing</b> elit.
+Lorem ipsum <i>dolor sit amet, consectetur <b>adipiscing</b> elit.
 Vestibulum lobortis. <s>Est vehicula rutrum <i>suscipit</i></s>, ipsum <s>lib</s>ero <i>placerat <b>tortor</b></i>.
 </p>
 <p>
@@ -320,8 +322,75 @@ Suspendisse <s>et elit in enim tempus iaculis</s>.
  *
  * (Отступы и переносы строк в примере добавлены для наглядности, при решении задачи их реализовывать не обязательно)
  */
+data class Type(val name: String) {
+    override fun toString(): String {
+        return when (name) {
+            "**" -> "b"
+            "*" -> "i"
+            else -> "s"
+        }
+    }
+
+    fun length(): Int {
+        return when (name) {
+            "**" -> 2
+            "*" -> 1
+            else -> 2
+        }
+    }
+}
+
 fun markdownToHtmlSimple(inputName: String, outputName: String) {
-    TODO()
+    File(outputName).bufferedWriter().use {
+        it.write("<html><body>")
+
+        val stack = Stack<String>()
+        val pattern = "\\*{2}|~{2}|\\*"
+        if (!File(inputName).readText().isEmpty()) it.write("<p>")
+
+        for (line in File(inputName).readLines()) {
+
+            var index0 = 0
+            var index = 0
+            var type = Type("")
+
+            if (line.isEmpty()) {
+                it.write("</p>")
+                if (!stack.empty()) throw IllegalArgumentException("BadFormat")
+                it.write("<p>")
+            } else {
+                if (line[0] != '*' && line[0] != '~') {
+                    val matchResult = Regex(pattern).find(line, index0)
+                    if (matchResult != null) {
+                        index0 = (matchResult).range.first
+                        it.write(line.substring(0, index0))
+                    }
+                }
+                do {
+                    val matchResult = Regex(pattern).find(line, index0)
+                    if (matchResult != null) {
+                        index = ((matchResult).range.first)
+                        type = Type(matchResult.value)
+                        if (index >= index0) {
+                            it.write(line.substring(index0, index))
+                        }
+                        if (!stack.empty() && "$type" == stack.peek()) {
+                            it.write("</$type>")
+                            stack.pop()
+                        } else {
+                            stack.push(type.toString())
+                            it.write("<$type>")
+                        }
+                    }
+                    index0 = index + type.length()
+                } while (matchResult != null)
+            }
+            it.write(line.substring(index0))
+        }
+        if (!File(inputName).readText().isEmpty()) it.write("</p>")
+        it.write("</body></html>")
+        if (!stack.empty()) throw IllegalArgumentException("BadFormat")
+    }
 }
 
 /**
@@ -487,7 +556,63 @@ fun printMultiplicationProcess(lhv: Int, rhv: Int, outputName: String) {
  * Используемые пробелы, отступы и дефисы должны в точности соответствовать примеру.
  *
  */
+fun firstDigits(number: Int, n: Int): Int {
+    val result = StringBuilder()
+    for (i in 0 until n) {
+        result.append("$number"[i])
+    }
+    return "$result".toInt()
+}
+
 fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
-    TODO()
+
+    val result = lhv / rhv
+    val forwardSpace = StringBuilder()
+    var i = 0
+    var remainder = 0
+    var long = 0
+    var lastRemainder = -1
+    val writer = File(outputName).bufferedWriter()
+
+    writer.write(" $lhv | $rhv")
+
+    while (i < "$result".length) {
+        writer.newLine()
+
+        val current = ("$result"[i] - '0') * rhv
+
+        if (i == 0) long = "$current".length else long++
+
+        if ("$forwardSpace-$current".length != ("$forwardSpace$remainder").length && i != 0 && lastRemainder != 0)
+            forwardSpace.deleteCharAt("$forwardSpace".length - 1)
+        writer.write("$forwardSpace-$current")
+
+        if (i == 0) {
+            val buffer = StringBuilder()
+            while ("$forwardSpace-$current$buffer".length < " $lhv | ".length) buffer.append(" ")
+            writer.write("$buffer$result")
+        }
+
+        writer.newLine()
+        writer.write("$forwardSpace")
+        writer.write("-$current".replace(Regex(".")) { "-" })
+        writer.newLine()
+
+        if (i == 0) remainder = firstDigits(lhv, long) - current
+        else remainder -= current
+
+        val lineLength = "$forwardSpace-$current".length
+        while (lineLength != ("$forwardSpace$remainder").length) forwardSpace.append(" ")
+        writer.write("$forwardSpace$remainder")
+        lastRemainder = remainder
+
+        if (i != "$result".length - 1) {
+            remainder = remainder * 10 + ("$lhv"[long] - '0')
+            writer.write(("$lhv"[long] - '0').toString())
+        }
+
+        i++
+    }
+    writer.close()
 }
 

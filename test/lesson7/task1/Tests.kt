@@ -1,5 +1,7 @@
 package lesson7.task1
 
+import lesson6.task1.plusMinus
+import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
@@ -250,7 +252,23 @@ Basic, Ruby, Swift.
                     """.trimIndent().replace(Regex("[\\s\\n\\t]"), "")
         assertEquals(expected, result)
 
+        Assertions.assertThrows(IllegalArgumentException::class.java) {
+            markdownToHtmlSimple(
+                "input/markdown_simple_2.md",
+                "temp2.html"
+            )
+        }
+
+        Assertions.assertThrows(IllegalArgumentException::class.java) {
+            markdownToHtmlSimple(
+                "input/markdown_simple_3.md",
+                "temp3.html"
+            )
+        }
+
         File("temp.html").delete()
+        File("temp2.html").delete()
+        File("temp3.html").delete()
     }
 
     @Test
@@ -436,6 +454,23 @@ Basic, Ruby, Swift.
                  -9
                  --
                   0
+             """
+        )
+
+        test(
+            2050,
+            10,
+            """
+              2050 | 10
+             -20     205
+             ---
+               05
+               -0
+               --
+                50
+               -50
+               ---
+                 0
              """
         )
 
