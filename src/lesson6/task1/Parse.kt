@@ -200,9 +200,9 @@ fun bestHighJump(jumps: String): Int {
  * Вернуть значение выражения (6 для примера).
  * Про нарушении формата входной строки бросить исключение IllegalArgumentException
  */
-fun legalElement(element: String): Boolean =
-    if (element.isEmpty()) false else
-        element.any { !it.isDigit() } || (element[0] == '0' && element.length > 1)
+
+fun legalElement(element: String) =
+    element.isNotEmpty() && (element.any { !it.isDigit() } || (element[0] == '0' && element.length > 1))
 
 fun plusMinus(expression: String): Int {
     val signs = expression.split(" ")
@@ -261,7 +261,7 @@ fun mostExpensive(description: String): String {
     val list = description.split(" ", "; ")
     var max = 0.0
     var result = -1
-    if (list.size % 2 ==1) return ""
+    if (list.size % 2 == 1) return ""
     for (i in 1 until list.size step 2) {
         if (list[i].isEmpty()) return ""
         val price = list[i].toDoubleOrNull() ?: return ""
