@@ -259,16 +259,8 @@ Basic, Ruby, Swift.
             )
         }
 
-        Assertions.assertThrows(IllegalArgumentException::class.java) {
-            markdownToHtmlSimple(
-                "input/markdown_simple_3.md",
-                "temp3.html"
-            )
-        }
-
         File("temp.html").delete()
         File("temp2.html").delete()
-        File("temp3.html").delete()
     }
 
     @Test
@@ -510,6 +502,17 @@ Basic, Ruby, Swift.
               -21960
               ------
                   10
+            """
+        )
+
+        test(
+            9,
+            60205,
+            """
+              9 | 60205
+             -0   0
+             --
+              9
             """
         )
 

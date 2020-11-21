@@ -346,6 +346,7 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
 
         val stack = Stack<String>()
         val pattern = "\\*{2}|~{2}|\\*"
+        var prevStringIsEmpty = false
         if (!File(inputName).readText().isEmpty()) it.write("<p>")
 
         for (line in File(inputName).readLines()) {
@@ -355,10 +356,13 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
             var type = Type("")
 
             if (line.isEmpty()) {
-                it.write("</p>")
-                if (!stack.empty()) throw IllegalArgumentException("BadFormat")
-                it.write("<p>")
+                if (!prevStringIsEmpty) {
+                    it.write("</p>")
+                    it.write("<p>")
+                }
+                prevStringIsEmpty = true
             } else {
+                prevStringIsEmpty = false
                 if (line[0] != '*' && line[0] != '~') {
                     val matchResult = Regex(pattern).find(line, index0)
                     if (matchResult != null) {
@@ -620,7 +624,10 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
             else remainder -= current
 
             val lineLength = "$forwardSpace-$current".length
-            while (lineLength != ("$forwardSpace$remainder").length) forwardSpace.append(" ")
+            while (lineLength != ("$forwardSpace$remainder").length) {
+                if (lineLength > ("$forwardSpace$remainder").length) forwardSpace.append(" ")
+                else forwardSpace.deleteCharAt("$forwardSpace".length - 1)
+            }
             writer.write("$forwardSpace$remainder")
             lastRemainder = remainder
 
