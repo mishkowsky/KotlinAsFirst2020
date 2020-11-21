@@ -349,14 +349,14 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
         var prevStringIsEmpty = false
         if (!File(inputName).readText().isEmpty()) it.write("<p>")
 
-        for (line in File(inputName).readLines()) {
+        for ((i, line) in File(inputName).readLines().withIndex()) {
 
             var index0 = 0
             var index = 0
             var type = Type("")
 
             if (line.isEmpty()) {
-                if (!prevStringIsEmpty) {
+                if (!prevStringIsEmpty && i != 0) {
                     it.write("</p>")
                     it.write("<p>")
                 }
@@ -578,7 +578,7 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
     var lastRemainder = -1
     val writer = File(outputName).bufferedWriter()
 
-    if (result / 10 == 0 && "$lhv".length > 1) {
+    if (result / 10 == 0 && "$lhv".length >= "-${rhv * result}".length) {
         val current = result * rhv
         writer.write("$lhv | $rhv")
         writer.newLine()
