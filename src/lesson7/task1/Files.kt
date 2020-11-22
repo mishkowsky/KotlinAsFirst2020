@@ -355,7 +355,7 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
             var index = 0
             var type = Type("")
 
-            if (line.isEmpty()) {
+            if (line.isEmpty() || line.isBlank()) {
                 if (!prevStringIsEmpty && i != 0) {
                     it.write("</p>")
                     it.write("<p>")
@@ -576,6 +576,7 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
     var remainder = 0
     var long = 0
     var lastRemainder = -1
+    var lineLength = 0
     val writer = File(outputName).bufferedWriter()
 
     if (result / 10 == 0 && "$lhv".length >= "-${rhv * result}".length) {
@@ -583,9 +584,7 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
         writer.write("$lhv | $rhv")
         writer.newLine()
         val buffer = StringBuilder()
-        while ("$buffer-$current".length < "$lhv".length) {
-            buffer.append(" ")
-        }
+        while ("$buffer-$current".length < "$lhv".length) buffer.append(" ")
         writer.write("$buffer-$current   $result")
         writer.newLine()
         writer.write("$lhv".replace(Regex(".")) { "-" })
@@ -604,8 +603,13 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
 
             if (i == 0) long = "$current".length else long++
 
-            if ("$forwardSpace-$current".length != ("$forwardSpace$remainder").length && i != 0 && lastRemainder != 0)
-                forwardSpace.deleteCharAt("$forwardSpace".length - 1)
+            val spaceLength = ("$forwardSpace").length
+            val prevLength = ("$forwardSpace$remainder").length
+
+            while ("$forwardSpace-$current".length != prevLength && i != 0 && lastRemainder != 0)
+                if ("$forwardSpace-$current".length > prevLength)
+                    forwardSpace.deleteCharAt("$forwardSpace".length - 1)
+                else forwardSpace.append(" ")
 
             writer.write("$forwardSpace-$current")
 
@@ -616,18 +620,27 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
             }
 
             writer.newLine()
+
+            while ("$forwardSpace".length > spaceLength)
+                forwardSpace.deleteCharAt("$forwardSpace".length - 1)
+
             writer.write("$forwardSpace")
-            writer.write("-$current".replace(Regex(".")) { "-" })
+
+            lineLength = if ("-$current".length >= "$remainder".length) {
+                writer.write("-$current".replace(Regex(".")) { "-" })
+                "$forwardSpace-$current".length
+            } else {
+                writer.write("$remainder".replace(Regex(".")) { "-" })
+                "$forwardSpace$remainder".length
+            }
+
             writer.newLine()
 
             if (i == 0) remainder = firstDigits(lhv, long) - current
             else remainder -= current
 
-            val lineLength = "$forwardSpace-$current".length
-            while (lineLength != ("$forwardSpace$remainder").length) {
-                if (lineLength > ("$forwardSpace$remainder").length) forwardSpace.append(" ")
-                else forwardSpace.deleteCharAt("$forwardSpace".length - 1)
-            }
+            while (lineLength > ("$forwardSpace$remainder").length) forwardSpace.append(" ")
+
             writer.write("$forwardSpace$remainder")
             lastRemainder = remainder
 
