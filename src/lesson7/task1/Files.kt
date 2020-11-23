@@ -344,25 +344,25 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
     File(outputName).bufferedWriter().use {
         it.write("<html><body>")
 
+        val lines = File(inputName).readLines().toList()
         val stack = Stack<String>()
         val pattern = "\\*{2}|~{2}|\\*"
-        var prevStringIsEmpty = false
         if (!File(inputName).readText().isEmpty()) it.write("<p>")
+        var firstNotBlank = -1
 
-        for ((i, line) in File(inputName).readLines().withIndex()) {
+        for ((i, line) in lines.withIndex()) {
 
             var index0 = 0
             var index = 0
             var type = Type("")
 
-            if (line.isEmpty() || line.isBlank()) {
-                if (!prevStringIsEmpty && i != 0) {
+            if (line.isBlank()) {
+                if (firstNotBlank == 1 && i != 0 && i != lines.count() - 1 && lines[i + 1].isNotBlank()) {
                     it.write("</p>")
                     it.write("<p>")
                 }
-                prevStringIsEmpty = true
             } else {
-                prevStringIsEmpty = false
+                firstNotBlank = 1
                 if (line[0] != '*' && line[0] != '~') {
                     val matchResult = Regex(pattern).find(line, index0)
                     if (matchResult != null) {
@@ -574,84 +574,81 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
     val forwardSpace = StringBuilder()
     var i = 0
     var remainder = 0
-    var long = 0
-    var lastRemainder = -1
+    var long = "${("$result"[0] - '0') * rhv}".length
     var lineLength = 0
     val writer = File(outputName).bufferedWriter()
+    var firstLineLength = 0
 
-    if (result / 10 == 0 && "$lhv".length >= "-${rhv * result}".length) {
-        val current = result * rhv
+    firstLineLength = if (("$result"[0] - '0') * rhv > firstDigits(lhv, long) || (result == 0 && lhv / 10 != 0)) {
         writer.write("$lhv | $rhv")
-        writer.newLine()
-        val buffer = StringBuilder()
-        while ("$buffer-$current".length < "$lhv".length) buffer.append(" ")
-        writer.write("$buffer-$current   $result")
-        writer.newLine()
-        writer.write("$lhv".replace(Regex(".")) { "-" })
-        writer.newLine()
-        buffer.clear()
-        while ("$buffer${lhv - current}".length < "$lhv".length) buffer.append(" ")
-        writer.write("$buffer${lhv - current}")
+        long++
+        "$lhv | ".length
     } else {
-
         writer.write(" $lhv | $rhv")
+        " $lhv | ".length
+    }
 
-        while (i < "$result".length) {
-            writer.newLine()
+    while (i < "$result".length) {
+        writer.newLine()
 
-            val current = ("$result"[i] - '0') * rhv
+        val current = ("$result"[i] - '0') * rhv
 
-            if (i == 0) long = "$current".length else long++
+        if (i != 0) long++
 
-            val spaceLength = ("$forwardSpace").length
-            val prevLength = ("$forwardSpace$remainder").length
+        val spaceLength = ("$forwardSpace").length
 
-            while ("$forwardSpace-$current".length != prevLength && i != 0 && lastRemainder != 0)
+        if (result == 0 && (lhv / 10 != 0)) {
+            remainder = lhv
+            long = "$lhv".length
+        }
+        val prevLength = ("$forwardSpace$remainder").length
+
+        if (remainder == lhv || i != 0 && remainder > 10)
+            while ("$forwardSpace-$current".length != prevLength)
                 if ("$forwardSpace-$current".length > prevLength)
                     forwardSpace.deleteCharAt("$forwardSpace".length - 1)
                 else forwardSpace.append(" ")
 
-            writer.write("$forwardSpace-$current")
+        writer.write("$forwardSpace-$current")
 
-            if (i == 0) {
-                val buffer = StringBuilder()
-                while ("$forwardSpace-$current$buffer".length < " $lhv | ".length) buffer.append(" ")
-                writer.write("$buffer$result")
-            }
-
-            writer.newLine()
-
-            while ("$forwardSpace".length > spaceLength)
-                forwardSpace.deleteCharAt("$forwardSpace".length - 1)
-
-            writer.write("$forwardSpace")
-
-            lineLength = if ("-$current".length >= "$remainder".length) {
-                writer.write("-$current".replace(Regex(".")) { "-" })
-                "$forwardSpace-$current".length
-            } else {
-                writer.write("$remainder".replace(Regex(".")) { "-" })
-                "$forwardSpace$remainder".length
-            }
-
-            writer.newLine()
-
-            if (i == 0) remainder = firstDigits(lhv, long) - current
-            else remainder -= current
-
-            while (lineLength > ("$forwardSpace$remainder").length) forwardSpace.append(" ")
-
-            writer.write("$forwardSpace$remainder")
-            lastRemainder = remainder
-
-            if (i != "$result".length - 1) {
-                remainder = remainder * 10 + ("$lhv"[long] - '0')
-                writer.write(("$lhv"[long] - '0').toString())
-            }
-
-            i++
+        if (i == 0) {
+            val buffer = StringBuilder()
+            while ("$forwardSpace-$current$buffer".length < firstLineLength) buffer.append(" ")
+            writer.write("$buffer$result")
         }
+
+        writer.newLine()
+
+        while ("$forwardSpace".length > spaceLength)
+            forwardSpace.deleteCharAt("$forwardSpace".length - 1)
+
+        writer.write("$forwardSpace")
+
+        lineLength = if ("-$current".length >= "$remainder".length) {
+            writer.write("-$current".replace(Regex(".")) { "-" })
+            "$forwardSpace-$current".length
+        } else {
+            writer.write("$remainder".replace(Regex(".")) { "-" })
+            "$forwardSpace$remainder".length
+        }
+
+        writer.newLine()
+
+        if (i == 0) remainder = firstDigits(lhv, long) - current
+        else remainder -= current
+
+        while (lineLength > ("$forwardSpace$remainder").length) forwardSpace.append(" ")
+
+        writer.write("$forwardSpace$remainder")
+
+        if (i != "$result".length - 1) {
+            remainder = remainder * 10 + ("$lhv"[long] - '0')
+            writer.write(("$lhv"[long] - '0').toString())
+        }
+
+        i++
     }
+
     writer.close()
 }
 
