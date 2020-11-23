@@ -575,9 +575,9 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
     var i = 0
     var remainder = 0
     var long = "${("$result"[0] - '0') * rhv}".length
-    var lineLength = 0
+    var lineLength: Int
     val writer = File(outputName).bufferedWriter()
-    var firstLineLength = 0
+    val firstLineLength: Int
 
     firstLineLength = if (("$result"[0] - '0') * rhv > firstDigits(lhv, long) || (result == 0 && lhv / 10 != 0)) {
         writer.write("$lhv | $rhv")
@@ -645,10 +645,8 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
             remainder = remainder * 10 + ("$lhv"[long] - '0')
             writer.write(("$lhv"[long] - '0').toString())
         }
-
         i++
     }
-
     writer.close()
 }
 
