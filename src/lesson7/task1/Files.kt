@@ -342,18 +342,17 @@ data class Type(val name: String) {
 
 fun markdownToHtmlSimple(inputName: String, outputName: String) {
     File(outputName).bufferedWriter().use {
-        it.write("<html><body>")
+        it.write("<html><body><p>")
 
         val lines = File(inputName).readLines().toList()
         val stack = Stack<String>()
         val pattern = "\\*{2}|~{2}|\\*"
-        if (!File(inputName).readText().isEmpty()) it.write("<p>")
         var firstNotBlank = -1
 
         for ((i, line) in lines.withIndex()) {
 
             var index0 = 0
-            var index = 0
+            var index: Int
             var type = Type("")
 
             if (line.isBlank()) {
@@ -391,8 +390,7 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
             }
             it.write(line.substring(index0))
         }
-        if (!File(inputName).readText().isEmpty()) it.write("</p>")
-        it.write("</body></html>")
+        it.write("</p></body></html>")
         if (!stack.empty()) throw IllegalArgumentException("BadFormat")
     }
 }
@@ -603,7 +601,7 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
         }
         val prevLength = ("$forwardSpace$remainder").length
 
-        if (remainder == lhv || i != 0 && remainder > 10)
+        if (remainder == lhv || i != 0 && remainder >= 10)
             while ("$forwardSpace-$current".length != prevLength)
                 if ("$forwardSpace-$current".length > prevLength)
                     forwardSpace.deleteCharAt("$forwardSpace".length - 1)
