@@ -261,7 +261,7 @@ fun decimalFromString(str: String, base: Int): Int {
  */
 
 val romanThousands = listOf("", "M", "MM", "MMM")
-val romanHundreds = listOf("", "C", "CC", "CCC", "CD", "D", "DC", "DCC", "CCM", "CM")
+val romanHundreds = listOf("", "C", "CC", "CCC", "CD", "D", "DC", "DCC", "DCCC", "CM")
 val romanTens = listOf("", "X", "XX", "XXX", "XL", "L", "LX", "LXX", "LXXX", "XC")
 val romanUnits = listOf("", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX")
 
