@@ -151,11 +151,11 @@ fun bestLongJump(jumps: String): Int {
     var max = -1
     if (jumps.isEmpty()) return -1
     for (n in tries) {
-        if (n.any { !it.isDigit() && (it !in longJumps || n.length > 1) || n[0] == '0' }) return -1
         val jump = n.toIntOrNull()
         if (jump != null) {
+            if (n.any { !it.isDigit() } || n[0] == '0') return -1
             if (jump > max) max = jump
-        }
+        } else if (n.any { it !in longJumps }) return -1
     }
     return max
 }
@@ -173,10 +173,9 @@ fun bestLongJump(jumps: String): Int {
  */
 fun bestHighJump(jumps: String): Int {
     val tries = jumps.split(" ")
-    var i = 0
     var max = -1
     if (jumps.isEmpty() || tries.size % 2 == 1) return -1
-    while (i < tries.size) {
+    for (i in tries.indices step 2) {
         var successful = false
         val jump = tries[i]
         if (jump.isEmpty()) return -1
@@ -185,8 +184,8 @@ fun bestHighJump(jumps: String): Int {
             if (letter !in highJumps) return -1
             if (letter == '+') successful = true
         }
-        if (jump.toInt() >= max && successful) max = jump.toInt()
-        i += 2
+        val value = jump.toInt()
+        if (value >= max && successful) max = value
     }
     return max
 }
@@ -201,26 +200,24 @@ fun bestHighJump(jumps: String): Int {
  * Про нарушении формата входной строки бросить исключение IllegalArgumentException
  */
 
-fun legalElement(element: String) =
-    element.isNotEmpty() && (element.any { !it.isDigit() } || (element[0] == '0' && element.length > 1))
-
 fun plusMinus(expression: String): Int {
+
+    fun illegalElement(element: String) =
+        element.isNotEmpty() && (element.any { !it.isDigit() } || (element[0] == '0' && element.length > 1))
+
     val signs = expression.split(" ")
-    var i = 1
+    if (signs.size % 2 != 1 || signs.isEmpty() || illegalElement(signs[0]))
+        throw IllegalArgumentException("BadFormat")
     var result = 0
-    if (expression.isEmpty()) throw IllegalArgumentException("BadFormat")
-    if (legalElement(signs[0])) throw IllegalArgumentException("BadFormat")
     result += signs[0].toInt()
-    if (signs.size % 2 != 1) throw IllegalArgumentException("BadFormat")
-    while (i < signs.size) {
+    for (i in 1 until signs.size step 2) {
         val number = signs[i + 1]
-        if (legalElement(number)) throw IllegalArgumentException("BadFormat")
+        if (illegalElement(number)) throw IllegalArgumentException("BadFormat")
         when {
             signs[i] == "+" -> result += number.toInt()
             signs[i] == "-" -> result -= number.toInt()
             else -> throw IllegalArgumentException("BadFormat")
         }
-        i += 2
     }
     return result
 }

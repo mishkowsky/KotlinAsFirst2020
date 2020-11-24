@@ -65,14 +65,14 @@ fun alignFile(inputName: String, lineLength: Int, outputName: String) {
  * Подчёркивание в середине и/или в конце строк значения не имеет.
  */
 fun deleteMarked(inputName: String, outputName: String) {
-    val writer = File(outputName).bufferedWriter()
-    for (line in File(inputName).readLines()) {
-        if (!line.startsWith('_')) {
-            writer.write(line)
-            writer.newLine()
+    File(outputName).bufferedWriter().use {
+        for (line in File(inputName).readLines()) {
+            if (!line.startsWith('_')) {
+                it.write(line)
+                it.newLine()
+            }
         }
     }
-    writer.close()
 }
 
 /**
@@ -91,12 +91,11 @@ fun countSubstrings(inputName: String, substrings: List<String>): Map<String, In
         map[string] = 0
         val lowString = string.toLowerCase()
         var i = 0
-        while (i in file.indices) {
+        while (i < file.length - 1) {
             val index = file.indexOf(lowString, i)
             if (index == -1) break
             map[string] = (map[string] ?: 0) + 1
-            i = index
-            i++
+            i = index + 1
         }
     }
     return map
@@ -353,7 +352,7 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
 
             var index0 = 0
             var index: Int
-            var type = Type("")
+            var type: Type
 
             if (line.isBlank()) {
                 if (firstNotBlank == 1 && i != 0 && i != lines.count() - 1 && lines[i + 1].isNotBlank()) {
