@@ -88,15 +88,14 @@ fun countSubstrings(inputName: String, substrings: List<String>): Map<String, In
     val map = mutableMapOf<String, Int>()
     val file = File(inputName).readText().toLowerCase()
     for (string in substrings) {
-        map[string] = 0
+        map[string] = -1
         val lowString = string.toLowerCase()
-        var i = 0
-        while (i < file.length - 1) {
-            val index = file.indexOf(lowString, i)
-            if (index == -1) break
-            map[string] = (map[string] ?: 0) + 1
-            i = index + 1
-        }
+        var index = -1
+        do {
+            index++
+            index = file.indexOf(lowString, index)
+            map[string] = map[string]!! + 1
+        } while (index != -1)
     }
     return map
 }
@@ -271,9 +270,7 @@ fun chooseLongestChaoticWord(inputName: String, outputName: String) {
             }
         }
     }
-    val writer = File(outputName).bufferedWriter()
-    writer.write(longWords.joinToString(", "))
-    writer.close()
+    File(outputName).bufferedWriter().use() { it.write(longWords.joinToString(", ")) }
 }
 
 /**
@@ -322,7 +319,7 @@ Suspendisse <s>et elit in enim tempus iaculis</s>.
  * (Отступы и переносы строк в примере добавлены для наглядности, при решении задачи их реализовывать не обязательно)
  */
 data class Type(val name: String) {
-    override fun toString(): String {
+    fun transform(): String {
         return when (name) {
             "**" -> "b"
             "*" -> "i"
@@ -346,44 +343,38 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
         val lines = File(inputName).readLines().toList()
         val stack = Stack<String>()
         val pattern = "\\*{2}|~{2}|\\*"
-        var firstNotBlank = -1
+        var firstNotBlank = false
 
         for ((i, line) in lines.withIndex()) {
 
             var index0 = 0
             var index: Int
-            var type: Type
+            var type: String
 
             if (line.isBlank()) {
-                if (firstNotBlank == 1 && i != 0 && i != lines.count() - 1 && lines[i + 1].isNotBlank()) {
+                if (firstNotBlank && i != 0 && i != lines.count() - 1 && lines[i + 1].isNotBlank()) {
                     it.write("</p>")
                     it.write("<p>")
                 }
             } else {
-                firstNotBlank = 1
-                if (line[0] != '*' && line[0] != '~') {
-                    val matchResult = Regex(pattern).find(line, index0)
-                    if (matchResult != null) {
-                        index0 = (matchResult).range.first
-                        it.write(line.substring(0, index0))
-                    }
-                }
+                firstNotBlank = true
                 do {
                     val matchResult = Regex(pattern).find(line, index0)
                     if (matchResult != null) {
                         index = ((matchResult).range.first)
-                        type = Type(matchResult.value)
+                        type = Type(matchResult.value).transform()
+                        val typeLength = Type(matchResult.value).length()
                         if (index >= index0) {
                             it.write(line.substring(index0, index))
                         }
-                        if (!stack.empty() && "$type" == stack.peek()) {
+                        if (!stack.empty() && type == stack.peek()) {
                             it.write("</$type>")
                             stack.pop()
                         } else {
-                            stack.push(type.toString())
+                            stack.push(type)
                             it.write("<$type>")
                         }
-                        index0 = index + type.length()
+                        index0 = index + typeLength
                     }
                 } while (matchResult != null)
             }
@@ -557,92 +548,87 @@ fun printMultiplicationProcess(lhv: Int, rhv: Int, outputName: String) {
  * Используемые пробелы, отступы и дефисы должны в точности соответствовать примеру.
  *
  */
-fun firstDigits(number: Int, n: Int): Int {
-    val result = StringBuilder()
-    for (i in 0 until n) {
-        result.append("$number"[i])
-    }
-    return "$result".toInt()
-}
 
 fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
 
-    val result = lhv / rhv
-    val forwardSpace = StringBuilder()
-    var i = 0
     var remainder = 0
-    var long = "${("$result"[0] - '0') * rhv}".length
-    var lineLength: Int
-    val writer = File(outputName).bufferedWriter()
-    val firstLineLength: Int
+    val result = lhv / rhv
+    var current = ("$result"[0] - '0') * rhv
+    var long = "$current".length
 
-    firstLineLength = if (("$result"[0] - '0') * rhv > firstDigits(lhv, long) || (result == 0 && lhv / 10 != 0)) {
-        writer.write("$lhv | $rhv")
-        long++
-        "$lhv | ".length
-    } else {
-        writer.write(" $lhv | $rhv")
-        " $lhv | ".length
-    }
+    File(outputName).bufferedWriter().use {
 
-    while (i < "$result".length) {
-        writer.newLine()
-
-        val current = ("$result"[i] - '0') * rhv
-
-        if (i != 0) long++
-
-        val spaceLength = ("$forwardSpace").length
+        val firstLineLength = if (current > "$lhv".take(long).toInt() || (result == 0 && lhv / 10 != 0)) {
+            it.write("$lhv | $rhv")
+            long++
+            "$lhv | ".length
+        } else {
+            it.write(" $lhv | $rhv")
+            " $lhv | ".length
+        }
 
         if (result == 0 && (lhv / 10 != 0)) {
             remainder = lhv
             long = "$lhv".length
         }
-        val prevLength = ("$forwardSpace$remainder").length
 
-        if (remainder == lhv || i != 0 && remainder >= 10)
-            while ("$forwardSpace-$current".length != prevLength)
-                if ("$forwardSpace-$current".length > prevLength)
-                    forwardSpace.deleteCharAt("$forwardSpace".length - 1)
-                else forwardSpace.append(" ")
+        var i = 0
+        var space = ""
 
-        writer.write("$forwardSpace-$current")
+        while (i < "$result".length) {
+            it.newLine()
 
-        if (i == 0) {
-            val buffer = StringBuilder()
-            while ("$forwardSpace-$current$buffer".length < firstLineLength) buffer.append(" ")
-            writer.write("$buffer$result")
+            current = ("$result"[i] - '0') * rhv
+
+            if (i != 0) long++
+
+            val spaceLength = space.length
+            val prevLength = ("$space$remainder").length
+
+            if (remainder == lhv || i != 0 && remainder >= 10)
+                space = if ("$space-$current".length > prevLength)
+                    space.dropLast("$space-$current".length - prevLength)
+                else space.padEnd(prevLength - "-$current".length, ' ')
+
+            it.write("$space-$current")
+
+            if (i == 0) {
+                var buffer = ""
+                if ("$space-$current".length < firstLineLength) buffer =
+                    "".padEnd(firstLineLength - "$space-$current".length, ' ')
+                it.write("$buffer$result")
+            }
+
+            it.newLine()
+
+            if (space.length > spaceLength)
+                space = space.dropLast(space.length - spaceLength)
+
+            it.write(space)
+
+            val lineLength = if ("-$current".length >= "$remainder".length) {
+                it.write("-$current".replace(Regex(".")) { "-" })
+                "$space-$current".length
+            } else {
+                it.write("$remainder".replace(Regex(".")) { "-" })
+                "$space$remainder".length
+            }
+
+            it.newLine()
+
+            if (i == 0) remainder = "$lhv".take(long).toInt() - current
+            else remainder -= current
+
+            if (lineLength > ("$space$remainder").length) space =
+                space.padEnd(lineLength - "$remainder".length)
+
+            it.write("$space$remainder")
+
+            if (i != "$result".length - 1) {
+                remainder = remainder * 10 + ("$lhv"[long] - '0')
+                it.write(("$lhv"[long] - '0').toString())
+            }
+            i++
         }
-
-        writer.newLine()
-
-        while ("$forwardSpace".length > spaceLength)
-            forwardSpace.deleteCharAt("$forwardSpace".length - 1)
-
-        writer.write("$forwardSpace")
-
-        lineLength = if ("-$current".length >= "$remainder".length) {
-            writer.write("-$current".replace(Regex(".")) { "-" })
-            "$forwardSpace-$current".length
-        } else {
-            writer.write("$remainder".replace(Regex(".")) { "-" })
-            "$forwardSpace$remainder".length
-        }
-
-        writer.newLine()
-
-        if (i == 0) remainder = firstDigits(lhv, long) - current
-        else remainder -= current
-
-        while (lineLength > ("$forwardSpace$remainder").length) forwardSpace.append(" ")
-
-        writer.write("$forwardSpace$remainder")
-
-        if (i != "$result".length - 1) {
-            remainder = remainder * 10 + ("$lhv"[long] - '0')
-            writer.write(("$lhv"[long] - '0').toString())
-        }
-        i++
     }
-    writer.close()
 }
