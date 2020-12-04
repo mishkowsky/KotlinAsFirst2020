@@ -270,7 +270,7 @@ fun chooseLongestChaoticWord(inputName: String, outputName: String) {
             }
         }
     }
-    File(outputName).bufferedWriter().use() { it.write(longWords.joinToString(", ")) }
+    File(outputName).bufferedWriter().use { it.write(longWords.joinToString(", ")) }
 }
 
 /**
@@ -573,7 +573,7 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
         }
 
         var i = 0
-        var space = ""
+        var spaceLength = 0
 
         while (i < "$result".length) {
             it.newLine()
@@ -582,36 +582,32 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
 
             if (i != 0) long++
 
-            val spaceLength = space.length
-            val prevLength = ("$space$remainder").length
+            val prevSpaceLength = spaceLength
+            val prevLineLength = ("$remainder").length + spaceLength
 
-            if (remainder == lhv || i != 0 && remainder >= 10)
-                space = if ("$space-$current".length > prevLength)
-                    space.dropLast("$space-$current".length - prevLength)
-                else space.padEnd(prevLength - "-$current".length, ' ')
+            if (remainder == lhv || i != 0 && remainder >= 10) spaceLength = prevLineLength - "-$current".length
 
-            it.write("$space-$current")
+            it.write("".padEnd(spaceLength) + "-$current")
 
             if (i == 0) {
                 var buffer = ""
-                if ("$space-$current".length < firstLineLength) buffer =
-                    "".padEnd(firstLineLength - "$space-$current".length, ' ')
+                if ("-$current".length + spaceLength < firstLineLength) buffer =
+                    "".padEnd(firstLineLength - "-$current".length - spaceLength)
                 it.write("$buffer$result")
             }
 
             it.newLine()
 
-            if (space.length > spaceLength)
-                space = space.dropLast(space.length - spaceLength)
+            if (spaceLength > prevSpaceLength) spaceLength = prevSpaceLength
 
-            it.write(space)
+            it.write("".padEnd(spaceLength))
 
             val lineLength = if ("-$current".length >= "$remainder".length) {
-                it.write("-$current".replace(Regex(".")) { "-" })
-                "$space-$current".length
+                it.write("".padEnd("-$current".length, '-'))
+                spaceLength + "-$current".length
             } else {
-                it.write("$remainder".replace(Regex(".")) { "-" })
-                "$space$remainder".length
+                it.write("".padEnd("$remainder".length, '-'))
+                spaceLength + "$remainder".length
             }
 
             it.newLine()
@@ -619,10 +615,9 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
             if (i == 0) remainder = "$lhv".take(long).toInt() - current
             else remainder -= current
 
-            if (lineLength > ("$space$remainder").length) space =
-                space.padEnd(lineLength - "$remainder".length)
+            if (lineLength > "$remainder".length + spaceLength) spaceLength = lineLength - "$remainder".length
 
-            it.write("$space$remainder")
+            it.write("".padEnd(spaceLength) + "$remainder")
 
             if (i != "$result".length - 1) {
                 remainder = remainder * 10 + ("$lhv"[long] - '0')
