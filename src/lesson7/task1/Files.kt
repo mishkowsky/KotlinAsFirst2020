@@ -88,13 +88,12 @@ fun countSubstrings(inputName: String, substrings: List<String>): Map<String, In
     val map = mutableMapOf<String, Int>()
     val file = File(inputName).readText().toLowerCase()
     for (string in substrings) {
-        map[string] = -1
         val lowString = string.toLowerCase()
         var index = -1
         do {
             index++
             index = file.indexOf(lowString, index)
-            map[string] = map[string]!! + 1
+            map[string] = (map[string] ?: -1) + 1
         } while (index != -1)
     }
     return map
@@ -341,15 +340,13 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
         it.write("<html><body><p>")
 
         val lines = File(inputName).readLines().toList()
-        val stack = Stack<String>()
+        val stack = Stack<Type>()
         val pattern = "\\*{2}|~{2}|\\*"
         var firstNotBlank = false
 
         for ((i, line) in lines.withIndex()) {
 
             var index0 = 0
-            var index: Int
-            var type: String
 
             if (line.isBlank()) {
                 if (firstNotBlank && i != 0 && i != lines.count() - 1 && lines[i + 1].isNotBlank()) {
@@ -361,20 +358,19 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
                 do {
                     val matchResult = Regex(pattern).find(line, index0)
                     if (matchResult != null) {
-                        index = ((matchResult).range.first)
-                        type = Type(matchResult.value).transform()
-                        val typeLength = Type(matchResult.value).length()
+                        val index = ((matchResult).range.first)
+                        val type = Type(matchResult.value)
                         if (index >= index0) {
                             it.write(line.substring(index0, index))
                         }
                         if (!stack.empty() && type == stack.peek()) {
-                            it.write("</$type>")
+                            it.write("</${type.transform()}>")
                             stack.pop()
                         } else {
                             stack.push(type)
-                            it.write("<$type>")
+                            it.write("<${type.transform()}>")
                         }
-                        index0 = index + typeLength
+                        index0 = index + type.length()
                     }
                 } while (matchResult != null)
             }
@@ -587,14 +583,12 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
 
             if (remainder == lhv || i != 0 && remainder >= 10) spaceLength = prevLineLength - "-$current".length
 
-            it.write("".padEnd(spaceLength) + "-$current")
+            it.write("-$current".padStart(spaceLength + "-$current".length))
 
-            if (i == 0) {
-                var buffer = ""
-                if ("-$current".length + spaceLength < firstLineLength) buffer =
-                    "".padEnd(firstLineLength - "-$current".length - spaceLength)
-                it.write("$buffer$result")
-            }
+            if (i == 0)
+                it.write(
+                    "$result".padStart(firstLineLength - "-$current".length - spaceLength + "$result".length)
+                )
 
             it.newLine()
 

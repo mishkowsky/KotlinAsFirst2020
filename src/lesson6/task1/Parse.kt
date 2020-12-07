@@ -153,7 +153,7 @@ fun bestLongJump(jumps: String): Int {
     for (n in tries) {
         val jump = n.toIntOrNull()
         if (jump != null) {
-            if (n.any { !it.isDigit() } || n[0] == '0') return -1
+            if (!n[0].isDigit() || n[0] == '0') return -1
             if (jump > max) max = jump
         } else if (n.any { it !in longJumps }) return -1
     }
@@ -179,7 +179,7 @@ fun bestHighJump(jumps: String): Int {
         var successful = false
         val jump = tries[i]
         if (jump.isEmpty()) return -1
-        if (jump.any { !it.isDigit() } || jump[0] == '0') return -1
+        if (!jump[0].isDigit() || jump[0] == '0') return -1
         for (letter in tries[i + 1]) {
             if (letter !in highJumps) return -1
             if (letter == '+') successful = true
